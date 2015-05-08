@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!-- Tracks the proximity of entities.  Updates are triggered only when the distance change of an existing
+     matching entity is detected and is for more than the proximity distance (measured in cm) in the subscribed
+     filter.
+     Properties
+     Version  = Interface version.
+     Matches  = Entities that match the subscribed filter.
+     Filter = The filter used this tracker is referring to.
+     Signals
+     Emits PropertiesChanged signal (consumer OnUpdate) when an entity is added or removed from the Matches property.
+     Consumer should only pay attention to signals for trackers in which it is interested.
+-->
+<node xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://www.alljoyn.org/schemas/introspect.xsd">
+  <interface name="org.alljoyn.locationservices.DistanceTracker">
+    <struct name="ProximityEntity">
+      <field name="entityDescriptor" type="s"/>
+      <field name="entityMAC" type="ay"/>
+      <field name="distance" type="d"/>
+    </struct>
+    <property name="Version" type="q" access="read"/>
+    <property name="Matches" type="a[DistanceEntity]" access="read">
+      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
+    </property>
+    <property name="Filter" type="s" access="read"/>
+    <signal name="PropertiesChanged" sessioncast="true">
+      <arg name="entity" type="[ProximityEntity]" direction="out"/>
+    </signal>
+  </interface>
+</node>
