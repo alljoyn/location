@@ -1,0 +1,325 @@
+<?xml version="1.0"?>
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN" "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="/org/alljoyn/locationservices" xsi:noNamespaceSchemaLocation="https://allseenalliance.org/schemas/introspect.xsd">
+  <interface name="org.alljoyn.locationservices">
+    <property name="Version" type="q" access="read"/>
+    <struct name="entity">
+      <field name="entityId" type="s"/>
+      <field name="entityMAC" type="s"/>
+    </struct>
+    <struct name="defaultPrivacyPolicy">
+      <field name="presencePolicy" type="u"/>
+      <field name="proximityPolicy" type="u"/>
+      <field name="locationPolicy" type="u"/>
+      <filed name="containmentPolicy" type="u"/>
+    </struct>
+    <!--
+    This syntax is not yet supported, it maybe in 15.04
+	<enum name="privacyPolicy">
+	    <enumerator name="ALLOW"    value="0"/>
+	    <enumerator name="DISALLOW" value="1"/>
+	    <enumerator name="CALLBACK" value="2"/>
+	</enum>
+        <struct name="defaultPrivacyPolicy">
+            <field name="presencePolicy"    type="[privacyPolicy]"/>
+	    <field name="proximityPolicy"   type="[privacyPolicy]"/>
+	    <field name="locationPolicy"    type="[privacyPolicy]"/>
+	    <filed name="containmentPolicy" type="[privacyPolicy]"/>
+	</struct>
+-->
+    <method name="getAllGroupIds">
+      <arg name="groupIds" type="as" direction="out"/>
+    </method>
+    <method name="createGroup">
+      <arg name="groupId" type="s" direction="in"/>
+    </method>
+    <method name="destroyGroup">
+      <arg name="groupId" type="s" direction="in"/>
+    </method>
+    <method name="joinGroup">
+      <arg name="groupId" type="s" direction="in"/>
+      <arg name="entity" type="[entity]" direction="in"/>
+    </method>
+    <method name="leaveGroup">
+      <arg name="groupId" type="s" direction="in"/>
+      <arg name="entity" type="[entity]" direction="in"/>
+    </method>
+    <method name="getGroupEntites">
+      <arg name="groupId" type="s" direction="in"/>
+      <arg name="entities" type="a[entity]" direction="out"/>
+    </method>
+    <method name="setDefaultPrivacyPolicy">
+      <arg name="entity" type="[entity]" direction="in"/>
+      <arg name="policy" type="[defaultPrivacyPolicy]" direction="in"/>
+    </method>
+    <method name="enityWhitelistAdd">
+      <arg name="entity" type="[entity]" direction="in"/>
+      <arg name="whitelist" type="as" direction="in"/>
+    </method>
+    <method name="enityBlacklistAdd">
+      <arg name="entity" type="[entity]" direction="in"/>
+      <arg name="blacklist" type="as" direction="in"/>
+    </method>
+    <method name="groupWhitelistAdd">
+      <arg name="groupId" type="s" direction="in"/>
+      <arg name="whitelist" type="as" direction="in"/>
+    </method>
+    <method name="groupBlacklistAdd">
+      <arg name="groupId" type="s" direction="in"/>
+      <arg name="blacklist" type="as" direction="in"/>
+    </method>
+    <method name="enityWhitelistDelete">
+      <arg name="entity" type="[entity]" direction="in"/>
+      <arg name="whitelist" type="as" direction="in"/>
+    </method>
+    <method name="enityBlacklistDelete">
+      <arg name="entity" type="[entity]" direction="in"/>
+      <arg name="blacklist" type="as" direction="in"/>
+    </method>
+    <method name="groupWhitelistDelete">
+      <arg name="groupId" type="s" direction="in"/>
+      <arg name="whitelist" type="as" direction="in"/>
+    </method>
+    <method name="groupBlacklistDelete">
+      <arg name="groupId" type="s" direction="in"/>
+      <arg name="blacklist" type="as" direction="in"/>
+    </method>
+    <method name="getGroupWhitelist">
+      <arg name="entity" type="[entity]" direction="in"/>
+      <arg name="whitelist" type="as" direction="out"/>
+    </method>
+    <method name="getGroupBlacklist">
+      <arg name="entity" type="[entity]" direction="in"/>
+      <arg name="blacklist" type="as" direction="out"/>
+    </method>
+  </interface>
+<!--   <node name="presence">-->
+    <interface name="org.alljoyn.locationservices.presence">
+    <property name="Version" type="q" access="read"/>
+      <struct name="entity">
+        <field name="entityId" type="s"/>
+        <field name="entityMAC" type="s"/>
+      </struct>
+      <method name="subscribeForEntity">
+        <arg name="entity" type="[entity]" direction="in"/>
+      </method>
+      <method name="subscibeForEntityList">
+        <arg name="entities" type="a[entity]" direction="in"/>
+      </method>
+      <method name="subscibeForEntityGroup">
+        <arg name="entityGroup" type="s" direction="in"/>
+      </method>
+      <method name="subscribeAll">
+    </method>
+      <method name="unsubscribeForEntity">
+        <arg name="entity" type="[entity]" direction="in"/>
+      </method>
+      <method name="unsubscribeForEntityList">
+        <arg name="entities" type="a[entity]" direction="in"/>
+      </method>
+      <method name="unsubscibeForEntityGroup">
+        <arg name="entityGroup" type="s" direction="in"/>
+      </method>
+      <method name="unsubscribeAll">
+    </method>
+      <method name="setPresence">
+        <arg name="entity" type="[entity]" direction="in"/>
+        <arg name="isPresent" type="b" direction="in"/>
+      </method>
+      <method name="queryPresence">
+        <arg name="entity" type="[entity]" direction="in"/>
+        <arg name="present" type="b" direction="out"/>
+      </method>
+      <method name="queryGroupPresence">
+        <arg name="entityGroup" type="s" direction="in"/>
+        <arg name="presentEntities" type="a[entity]" direction="out"/>
+      </method>
+      <method name="queryAllPresence">
+        <arg name="presentEntities" type="a[entity]" direction="out"/>
+      </method>
+      <signal name="present">
+        <arg name="entity" type="[entity]" direction="out"/>
+        <arg name="isPresent" type="b" direction="out"/>
+      </signal>
+    </interface>
+<!--  </node>
+  <node name="proximity"> -->
+    <interface name="org.alljoyn.locationservices.proximity">
+    <property name="Version" type="q" access="read"/>
+    <struct name="entity">
+      <field name="entityId" type="s"/>
+      <field name="entityMAC" type="s"/>
+    </struct>
+
+    <!--
+subscribe for events that occur when firstEntity and secondEntity are in proximity. 
+Events are only sent again if the proximity change is  more than deltaDistance (measured in cm)
+-->
+    <method name="subscribeEntityDistanceTracking">
+      <arg name="firstEntity" type="(ss)" direction="in"/>
+      <arg name="secondEntity" type="(ss)" direction="in"/>
+      <arg name="distanceDelta" type="i" direction="in"/>
+    </method>
+    <!--
+send a signal when the two entities are less than Distance from each other
+e.g, let me know when my son is near the fridge
+-->
+    <method name="subscribeEntityGeoFenceTracking">
+      <arg name="firstEntity" type="(ss)" direction="in"/>
+      <arg name="secondEntity" type="(ss)" direction="in"/>
+      <arg name="distance" type="i" direction="in"/>
+    </method>
+    <!--
+send a notification when any other entity is within a specified
+distance to the passed entity
+e.g., let me know when anything gets near the fridge
+-->
+    <method name="subscribeForAnyProximateEntity">
+      <arg name="entity" type="(ss)" direction="in"/>
+      <arg name="distance" type="i" direction="in"/>
+    </method>
+    <method name="unsubscribeEntityDistanceTracking">
+      <arg name="firstEntity" type="(ss)" direction="in"/>
+      <arg name="secondEntity" type="(ss)" direction="in"/>
+    </method>
+    <method name="unsubscribeEntityGeoFenceTracking">
+      <arg name="firstEntity" type="(ss)" direction="in"/>
+      <arg name="secondEntity" type="(ss)" direction="in"/>
+      <arg name="Distance" type="i" direction="in"/>
+    </method>
+    <method name="unsubscribeForAnyProximateEntity">
+      <arg name="entity" type="(ss)" direction="in"/>
+    </method>
+    <!-- server side API -->
+    <method name="setProximityDistance">
+      <arg name="firstEntity" type="[entity]" direction="in"/>
+      <arg name="secondEntity" type="[entity]" direction="in"/>
+      <arg name="distance" type="i" direction="in"/>
+      <arg name="distanceMultiplier" type="i" direction="in"/>
+      <arg name="accuracy" type="i" direction="in"/>
+      <arg name="accuracyMultiplier" type="i" direction="in"/>
+    </method>
+    <method name="setDefaultServiceEntity">
+      <arg name="myEntity" type="[entity]" direction="in"/>
+    </method>
+    <method name="setDefaultProximityAccuracy">
+      <arg name="entity" type="[entity]" direction="in"/>
+      <arg name="accuracy" type="i" direction="in"/>
+      <arg name="accuracyMultiplier" type="i" direction="in"/>
+    </method>
+    <method name="queryProximity">
+      <arg name="firstEntity" type="[entity]" direction="in"/>
+      <arg name="secondEntity" type="[entity]" direction="in"/>
+      <arg name="distance" type="i" direction="out"/>
+      <arg name="distanceMultiplier" type="i" direction="out"/>
+      <arg name="accuracy" type="i" direction="out"/>
+      <arg name="accuracyMultiplier" type="i" direction="out"/>
+    </method>
+    <!-- gets all the entities that are within a specified distance -->
+    <method name="queryAllProximity">
+      <arg name="entity" type="[entity]" direction="in"/>
+      <arg name="distance" type="i" direction="in"/>
+      <arg name="distanceMultiplier" type="i" direction="in"/>
+      <arg name="nearbyEntities" type="a[entity]" direction="out"/>
+    </method>
+    <signal name="proximity">
+      <arg name="firstEntity" type="[entity]" direction="out"/>
+      <arg name="secondEntity" type="[entity]" direction="out"/>
+      <arg name="distance" type="i" direction="out"/>
+      <arg name="distanceMultiplier" type="i" direction="out"/>
+      <arg name="accuracy" type="i" direction="out"/>
+      <arg name="accuracyMultiplier" type="i" direction="out"/>
+    </signal>
+    </interface>
+<!--  </node>
+  <node name="location"> -->
+    <interface name="org.alljoyn.locationservices.location">
+    <property name="Version" type="q" access="read"/>
+    <struct name="entity">
+      <field name="entityId" type="s"/>
+      <field name="entityMAC" type="s"/>
+    </struct>
+
+    <struct name="wgs84Data">
+      <field name="longitude" type="i"/>
+      <field name="latitude" type="i"/>
+      <field name="altitude" type="i"/>
+    </struct>
+    <method name="subscribeForEntityLocation">
+      <arg name="entity" type="[entity]" direction="in"/>
+      <arg name="updateInterval" type="i" direction="in"/>
+      <arg name="distanceDelta" type="i" direction="in"/>
+      <arg name="distanceMultiplier" type="i" direction="in"/>
+    </method>
+    <method name="subscribeForEntyListLocation">
+      <arg name="entities" type="a[entity]" direction="in"/>
+      <arg name="updateInterval" type="i" direction="in"/>
+      <arg name="distanceDelta" type="i" direction="in"/>
+      <arg name="distanceMultiplier" type="i" direction="in"/>
+      <!--- power is an enum of HIGH, LOW or UNSPECIFIED -->
+      <arg name="powerPreference" type="u" direction="in"/>
+      <!--  Accuracy is an enum of HIGH, LOW or UNPSECIFIED -->
+      <arg name="accuracyPreference" type="u" diretion="in"/>
+
+    </method>
+    <method name="unsubscribeForEntityLocation">
+      <arg name="entity" type="[entity]" direction="in"/>
+      <!--- power is an enum of HIGH, LOW or UNSPECIFIED -->
+      <arg name="powerPreference" type="u" direction="in"/>
+      <!--  Accuracy is an enum of HIGH, LOW or UNPSECIFIED -->
+      <arg name="accuracyPreference" type="u" diretion="in"/>
+
+    </method>
+    <method name="unsubscribeForEntityListLocation">
+      <arg name="entities" type="a[entity]" direction="in"/>
+      <!--- power is an enum of HIGH, LOW or UNSPECIFIED -->
+      <arg name="powerPreference" type="u" direction="in"/>
+      <!--  Accuracy is an enum of HIGH, LOW or UNPSECIFIED -->
+      <arg name="accuracyPreference" type="u" diretion="in"/>
+    </method>
+    <method name="setLocation">
+      <arg name="entity" type="[entity]" direction="in"/>
+      <arg name="location" type="[wgs84Data]" direction="in"/>
+      <arg name="horizontalAccuracy" type="i" direction="out"/>
+      <arg name="horizontalAccuracyMultiplier" type="i" direction="out"/>
+      <arg name="verticalAccuracy" type="i" direction="out"/>
+      <arg name="virticalAccuracyMultiplier" type="i" direction="out"/>
+    </method>
+    <method name="setDefaultLocationAccuracy">
+      <arg name="entity" type="[entity]" direction="in"/>
+      <arg name="horizontalAccuracy" type="i" direction="in"/>
+      <arg name="horizontalAccuracyMultiplier" type="i" direction="in"/>
+      <arg name="verticalAccuracy" type="i" direction="in"/>
+      <arg name="verticalAccuracyMultiplier" type="i" direction="in"/>
+    </method>
+    <method name="queryLocation">
+      <arg name="entity" type="[entity]" direction="in"/>
+      <arg name="location" type="[wgs84Data]" direction="out"/>
+      <arg name="horizontalAccuracy" type="i" direction="out"/>
+      <arg name="horizontalAccuracyMultiplier" type="i" direction="out"/>
+      <arg name="verticalAccuracy" type="i" direction="out"/>
+      <arg name="verticalAccuracyMultiplier" type="i" direction="out"/>
+      <!--- power is an enum of HIGH, LOW or UNSPECIFIED -->
+      <arg name="powerPreference" type="u" direction="in"/>
+      <!--  Accuracy is an enum of HIGH, LOW or UNPSECIFIED -->
+      <arg name="accuracyPreference" type="u" diretion="in"/>
+    </method>
+    <method name="queryAllLocation">
+      <arg name="location" type="[wgs84Data]" direction="in"/>
+      <arg name="horizontalDelta" type="i" direction="in"/>
+      <arg name="horizontalDeltaMultiplier" type="i" direction="in"/>
+      <arg name="verticalDelta" type="i" direction="in"/>
+      <arg name="verticalDeltaMultiplier" type="i" direction="in"/>
+      <arg name="nearbyEntities" type="a[entity]" direction="out"/>
+    </method>
+    <signal name="location">
+      <arg name="entity" type="[entity]" direction="out"/>
+      <arg name="location" type="[wgs84Data]" direction="out"/>
+      <arg name="horizontalAccuracy" type="i" direction="out"/>
+      <arg name="horizonalAccuracyMultiplier" type="i" direction="out"/>
+      <arg name="verticalAccuracy" type="i" direction="out"/>
+      <arg name="verticalAccuracyMultiplier" type="i" direction="out"/>
+    </signal>
+    </interface>
+<!--  </node>-->
+</node>
