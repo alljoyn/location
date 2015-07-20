@@ -1,0 +1,162 @@
+<?xml version="1.0"?>
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN" "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="/org/alljoyn/locationservices" xsi:noNamespaceSchemaLocation="https://allseenalliance.org/schemas/introspect.xsd">
+  <interface name="org.alljoyn.locationservices">
+    <!-- The entityDescriptor fields provides a user understandable description of the entity, 
+           e.g. it can contain the information of groups -->
+    <struct name="Entity">
+      <field name="entityDescriptor" type="s"/>
+      <field name="entityMAC" type="s"/>
+    </struct>      
+    <struct name="PresenceFilter">
+      <field name="descriptorParser" type="s"/>
+      <field name="macParser" type="s"/>
+    </struct>
+    <struct name="ProximityFilter">
+      <field name="descriptorParser" type="s"/>
+      <field name="macParser" type="s"/>
+      <field name="proximity" type="d"/>
+    </struct>
+    <struct name="LocationFilter">
+      <field name="descriptorParser" type="s"/>
+      <field name="macParser" type="s"/>
+    </struct>
+
+    <property name="Version" type="q" access="read"/>
+
+    <!-- Inject entity information into the provider.  The provider will inject the information, as necessary,
+         to any active trackers.
+    -->
+    <method name="updatePresenceInfo">
+      <arg name="entity" type="[Entity]" direction="in"/>
+      <arg name="presenceInfo" type="b" direction="in"/>
+    </method>
+    
+    <method name="updateProximityInfo">
+      <arg name="entity" type="[Entity]" direction="in"/>
+      <arg name="referenceEntity" type="[Entity]" direction="in"/>
+      <arg name="proximityInfo" type="d" direction="in"/>
+    </method>
+      
+    <method name="updateLocationInfo">
+      <arg name="entity" type="[Entity]" direction="in"/>      
+      <arg name="locationInfo" type="d" direction="in"/>
+    </method>
+      
+
+    <!-- Request presence tracking of entities that match the filter parsers.  Signals tagged with the 
+         returned tracker value are relevant; other signals should be ignored.
+    -->
+    <method name="PresenceSubscribe">
+      <arg name="filter" type="[PresenceFilter]" direction="in"/>
+      <arg name="tracker" type="o" direction="out"/>
+    </method>
+
+    <!-- Request distance tracking of entities that match the filter parsers.  Signals tagged with the 
+         returned tracker value are relevant; other signals should be ignored.
+    -->
+    <method name="ProximitySubscribe">
+      <arg name="referenceEntity" type="[Entity]" direction="in"/>
+      <arg name="filter" type="[ProximityFilter]" direction="in"/>
+      <arg name="tracker" type="o" direction="out"/>
+    </method>
+
+    <!-- Request location tracking of entities that match the filter parsers.  Signals tagged with the 
+         returned tracker value are relevant; other signals should be ignored. 
+         e.g, let me know when my son is near the fridge
+    -->
+    <method name="LocationSubscribe">      
+      <arg name="filter" type="[LocationFilter]" direction="in"/>
+      <arg name="tracker" type="o" direction="out"/>
+    </method>
+
+    <!-- Unsubscribe for tracker. 
+    -->
+    <method name="Unsubscribe">
+      <annotation name="org.freedesktop.DBus.Method.NoReply" value="true"/>
+      <arg name="tracker" type="o" direction="in"/>
+    </method>
+  </interface>
+
+
+
+<!-- Tracks the "presence" of entities.  Updates are triggered only when the actual present/not-present status
+     of an existing matching entity is detected.
+     Properties  
+       Version  = Interface version.       
+       Matches  = Entities that match the subscribed filter parsers.
+       Filter = The filter used this tracker is referring to.    
+     Signals
+       Emits PropertiesChanged signal (consumer OnUpdate) when an entity is added or removed from the Matches property.       
+    Consumer should only pay attention to signals for trackers in which it is interested.
+-->    
+  <interface name="org.alljoyn.locationservices.PresenceTracker">
+    <struct name="PresenceEntity">
+      <field name="entityDescriptor"  type="s"/>
+      <field name="entityMAC" type="ay"/>
+    </struct>
+    <property name="Version" type="q" access="read"/>
+    <property name="Matches" type="a[PresenceEntity]" access="read">
+      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
+    </property>
+    <property name="Filter" type="s" access="read"/>  
+      <signal name="PropertiesChanged" sessioncast="true">
+        <arg name="entity" type="[PresenceEntity]" direction="out"/>
+      </signal>
+  </interface>
+
+
+
+<!-- Tracks the proximity of entities.  Updates are triggered only when the distance change of an existing
+     matching entity is detected and is for more than the proximity distance (measured in cm) in the subscribed 
+     filter.
+     Properties  
+       Version  = Interface version.
+       Matches  = Entities that match the subscribed filter. 
+       Filter = The filter used this tracker is referring to.
+     Signals
+        Emits PropertiesChanged signal (consumer OnUpdate) when an entity is added or removed from the Matches property.       
+    Consumer should only pay attention to signals for trackers in which it is interested.
+-->    
+  <interface name="org.alljoyn.locationservices.DistanceTracker">
+    <struct name="ProximityEntity">
+      <field name="entityDescriptor"  type="s"/>
+      <field name="entityMAC" type="ay"/>
+      <field name="distance"  type="d"/>
+    </struct>
+    <property name="Version" type="q" access="read"/>    
+    <property name="Matches" type="a[DistanceEntity]" access="read">
+      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
+    </property>
+    <property name="Filter" type="s" access="read"/>  
+      <signal name="PropertiesChanged" sessioncast="true">
+        <arg name="entity" type="[ProximityEntity]" direction="out"/>
+      </signal>
+  </interface>
+
+<!-- Tracks the "location" of entities.  
+     Properties  
+       Version  = Interface version.
+       Matches  = Entities that match the subscribed filter. 
+       Filter = The filter used this tracker is referring to.
+     Signals
+       Emits PropertiesChanged signal (consumer OnUpdate) when an entity is added or removed from the Matches property.       
+    Consumer should only pay attention to signals for trackers in which it is interested.
+-->    
+  <interface name="org.alljoyn.locationservices.LocationTracker">
+    <struct name="LocationEntity">
+      <field name="entityDescriptor"  type="s"/>
+      <field name="entityMAC" type="ay"/>
+      <field name="locationInfo" type="i" />
+    </struct>
+    <property name="Version" type="q" access="read"/>
+    <property name="Matches" type="a[LocationEntity]" access="read">
+      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
+    </property>
+    <property name="Filter" type="s" access="read"/>    
+      <signal name="PropertiesChanged" sessioncast="true">
+        <arg name="entity" type="[LocationEntity]" direction="out"/>
+      </signal>
+  </interface>
+
+</node>
