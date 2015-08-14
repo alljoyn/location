@@ -1,0 +1,7 @@
+build/
+config.log
+dist/
+.sconsign.dblite
+.sconf_temp/
+.whitespace.db
+*.pyc

@@ -27,9 +27,9 @@
 
 #include <qcc/String.h>
 #include <qcc/StringUtil.h>
-#include <qcc/Util.h>
 
 #include <algorithm>
+#include <stdio.h>
 #include <signal.h>
 
 using namespace ajn;
@@ -99,11 +99,11 @@ typedef std::vector<Entity> Matches;
 class Producer;
 
 class PresenceTrackerObj : public BusObject {
-public:
+  public:
     PresenceTrackerObj(Producer* producer, const char* path);
     virtual ~PresenceTrackerObj() { }
     QStatus Register(BusAttachment* bus);
-private:
+  private:
     Producer* m_producer;
     uint16_t m_version;
     virtual QStatus Get(const char* ifcName, const char* propName, ajn::MsgArg& val);
@@ -111,14 +111,14 @@ private:
 };
 
 class Producer : public BusObject, public SessionPortListener {
-public:
+  public:
     Producer();
     virtual ~Producer();
     QStatus Start(BusAttachment* bus);
     QStatus Add(const Entity& entity);
     QStatus Remove(const Entity& entity);
     const Matches& GetMatches();
-private:
+  private:
     BusAttachment* m_bus;
     AboutData m_aboutData;
     AboutObj* m_aboutObj;
@@ -129,11 +129,11 @@ private:
     void MatchesChanged();
 };
 
-Producer::Producer() 
+Producer::Producer()
     : BusObject("/")
     , m_bus(NULL)
     , m_aboutData("en")
-    , m_aboutObj(NULL) 
+    , m_aboutObj(NULL)
 {
     const uint8_t appId[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
     m_aboutData.SetAppId(appId, 16);
@@ -168,7 +168,7 @@ QStatus Producer::Start(BusAttachment* bus)
         { intf->GetMember("PresenceSubscribe"), static_cast<MessageReceiver::MethodHandler>(&Producer::PresenceSubscribe) },
     };
     AddInterface(*intf, ANNOUNCED);
-    QStatus status = AddMethodHandlers(handlers, ArraySize(handlers));
+    QStatus status = AddMethodHandlers(handlers, sizeof(handlers) / sizeof(handlers[0]));
     if (ER_OK != status) {
         fprintf(stderr, "Add handlers failed - %s", QCC_StatusText(status));
         return status;
@@ -251,7 +251,7 @@ void Producer::MatchesChanged()
 {
     const char* propNames[] = { "Matches" };
     for (vector<PresenceTrackerObj*>::iterator it = m_presenceTrackers.begin(); it != m_presenceTrackers.end(); ++it) {
-        QStatus status = (*it)->EmitPropChanged(org::alljoyn::locationservices::PresenceTracker::InterfaceName, 
+        QStatus status = (*it)->EmitPropChanged(org::alljoyn::locationservices::PresenceTracker::InterfaceName,
                                                 propNames, 1, SESSION_ID_ALL_HOSTED);
         if (status != ER_OK) {
             fprintf(stderr, "Emit properties changed failed - %s\n", QCC_StatusText(status));
@@ -378,7 +378,7 @@ int CDECL_CALL main(int, char* argv[])
         printf("%s\n", QCC_StatusText(status));
     }
 
- exit:
+exit:
     bus->Stop();
     bus->Join();
     delete producer;

@@ -28,6 +28,7 @@
 #include <qcc/StringUtil.h>
 
 #include <signal.h>
+#include <stdio.h>
 
 using namespace ajn;
 using namespace qcc;
@@ -85,10 +86,10 @@ static QStatus CreateInterfaces(BusAttachment* bus)
 }
 
 class Consumer : public AboutListener, public ProxyBusObject::PropertiesChangedListener {
-public:
+  public:
     virtual ~Consumer() { }
     QStatus Start(BusAttachment* bus);
-private:
+  private:
     BusAttachment* m_bus;
     virtual void Announced(const char* name, uint16_t version, SessionPort port,
                            const MsgArg& objectDescriptionArg, const MsgArg& aboutDataArg);
@@ -237,7 +238,7 @@ int CDECL_CALL main(int, char* argv[])
             assert(status == ER_OK);
             MsgArg arg("(ss)", "idFilter", "macFilter");
             Message reply(*bus);
-            status = proxyObj.MethodCall(org::alljoyn::locationservices::InterfaceName, "PresenceSubscribe", 
+            status = proxyObj.MethodCall(org::alljoyn::locationservices::InterfaceName, "PresenceSubscribe",
                                          &arg, 1, reply);
             if (status == ER_OK) {
                 char* trackerPath;
@@ -253,7 +254,7 @@ int CDECL_CALL main(int, char* argv[])
         printf("%s\n", QCC_StatusText(status));
     }
 
- exit:
+exit:
     bus->Stop();
     bus->Join();
     delete consumer;

@@ -1,0 +1,16 @@
+Import('env')
+
+sample_env = env.Clone()
+
+sample_env.Append(CPPDEFINES = ['ROUTER'])
+sample_env.Prepend(LIBS = ['ajrouter'])
+
+sample_env.Append(LIBPATH = "#dist/lib")
+sample_env.Prepend(LIBS = "alljoyn_location")
+
+Export('sample_env')
+
+# Add/remove projects from build
+
+sample_env.SConscript(['consumer/SConscript'])
+sample_env.SConscript(['producer/SConscript'])
