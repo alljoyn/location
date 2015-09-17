@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<node xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://www.alljoyn.org/schemas/introspect.xsd">
+  <interface name="org.alljoyn.locationservices.presence">
+    <property name="Version" type="q" access="read"/>
+    <struct name="Entity">
+      <field name="entityId" type="s"/>
+      <field name="entityMAC" type="s"/>
+    </struct>
+    <method name="SubscribeForEntity">
+      <arg name="entity" type="[Entity]" direction="in"/>
+    </method>
+    <method name="SubscibeForEntityList">
+      <arg name="entities" type="a[Entity]" direction="in"/>
+    </method>
+    <method name="SubscibeForEntityGroup">
+      <arg name="entityGroup" type="s" direction="in"/>
+    </method>
+    <method name="SubscribeAll">
+    </method>
+    <method name="UnsubscribeForEntity">
+      <arg name="entity" type="[Entity]" direction="in"/>
+    </method>
+    <method name="UnsubscribeForEntityList">
+      <arg name="entities" type="a[Entity]" direction="in"/>
+    </method>
+    <method name="UnsubscibeForEntityGroup">
+      <arg name="EntityGroup" type="s" direction="in"/>
+    </method>
+    <method name="UnsubscribeAll">
+    </method>
+    <method name="SetPresence">
+      <arg name="entity" type="[Entity]" direction="in"/>
+      <arg name="isPresent" type="b" direction="in"/>
+    </method>
+    <method name="QueryPresence">
+      <arg name="entity" type="[Entity]" direction="in"/>
+      <arg name="present" type="b" direction="out"/>
+    </method>
+    <method name="QueryGroupPresence">
+      <arg name="EntityGroup" type="s" direction="in"/>
+      <arg name="presentEntities" type="a[Entity]" direction="out"/>
+    </method>
+    <method name="QueryAllPresence">
+      <arg name="presentEntities" type="a[Entity]" direction="out"/>
+    </method>
+    <signal name="present">
+      <arg name="entity" type="[Entity]" direction="out"/>
+      <arg name="isPresent" type="b" direction="out"/>
+    </signal>
+  </interface>
+</node>

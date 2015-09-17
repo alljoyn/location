@@ -1,0 +1,138 @@
+<?xml version="1.0"?>
+<node xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://www.alljoyn.org/schemas/introspect.xsd">
+  <interface name="org.alljoyn.locationservices">
+    <property name="Version" type="q" access="read"/>
+    <!-- The entityDescriptor fields provides a user understandable description of the entity,
+         e.g. it can contain the information of groups -->
+    <struct name="Entity">
+      <field name="entityDescriptor" type="s"/>
+      <field name="entityMAC" type="s"/>
+    </struct>
+    <dict name="Group">
+      <key type="s"/>
+      <value type="[Entity]"/>
+    </dict>
+    <struct name="PresenceFilter">
+      <field name="descriptorParser" type="s"/>
+      <field name="macParser" type="s"/>
+    </struct>
+    <struct name="ProximityFilter">
+      <field name="descriptorParser" type="s"/>
+      <field name="macParser" type="s"/>
+      <field name="proximity" type="d"/>
+    </struct>
+    <struct name="LocationFilter">
+      <field name="descriptorParser" type="s"/>
+      <field name="macParser" type="s"/>
+    </struct>
+    <!-- Inject entity information into the provider.  The provider will inject the information, as necessary,
+         to any active trackers.
+    -->
+    <method name="updatePresenceInfo">
+      <arg name="entity" type="[Entity]" direction="in"/>
+      <arg name="presenceInfo" type="b" direction="in"/>
+    </method>
+    <method name="updateProximityInfo">
+      <arg name="entity" type="[Entity]" direction="in"/>
+      <arg name="referenceEntity" type="[Entity]" direction="in"/>
+      <arg name="proximityInfo" type="d" direction="in"/>
+    </method>
+    <method name="updateLocationInfo">
+      <arg name="entity" type="[Entity]" direction="in"/>
+      <arg name="locationInfo" type="d" direction="in"/>
+    </method>
+    <!-- Request presence tracking of entities that match the filter parsers.  Signals tagged with the
+         returned tracker value are relevant; other signals should be ignored.
+    -->
+    <method name="PresenceSubscribe">
+      <arg name="filter" type="[PresenceFilter]" direction="in"/>
+      <arg name="tracker" type="o" direction="out"/>
+    </method>
+    <!-- Request distance tracking of entities that match the filter parsers.  Signals tagged with the
+         returned tracker value are relevant; other signals should be ignored.
+    -->
+    <method name="ProximitySubscribe">
+      <arg name="referenceEntity" type="[Entity]" direction="in"/>
+      <arg name="filter" type="[ProximityFilter]" direction="in"/>
+      <arg name="tracker" type="o" direction="out"/>
+    </method>
+    <!-- Request location tracking of entities that match the filter parsers.  Signals tagged with the
+         returned tracker value are relevant; other signals should be ignored.
+         e.g, let me know when my son is near the fridge
+    -->
+    <method name="LocationSubscribe">
+      <arg name="filter" type="[LocationFilter]" direction="in"/>
+      <arg name="tracker" type="o" direction="out"/>
+    </method>
+    <!-- Unsubscribe for tracker.
+    -->
+    <method name="Unsubscribe">
+      <annotation name="org.freedesktop.DBus.Method.NoReply" value="true"/>
+      <arg name="tracker" type="o" direction="in"/>
+    </method>
+    <struct name="defaultPrivacyPolicy">
+      <field name="presencePolicy" type="u"/>
+      <field name="proximityPolicy" type="u"/>
+      <field name="locationPolicy" type="u"/>
+      <filed name="containmentPolicy" type="u"/>
+    </struct>
+    <!--
+        This syntax is not yet supported, it maybe in 15.04
+	<enum name="privacyPolicy">
+	<enumerator name="ALLOW"    value="0"/>
+	<enumerator name="DISALLOW" value="1"/>
+	<enumerator name="CALLBACK" value="2"/>
+	</enum>
+        <struct name="defaultPrivacyPolicy">
+        <field name="presencePolicy"    type="[privacyPolicy]"/>
+	<field name="proximityPolicy"   type="[privacyPolicy]"/>
+	<field name="locationPolicy"    type="[privacyPolicy]"/>
+	<filed name="containmentPolicy" type="[privacyPolicy]"/>
+	</struct>
+    -->
+    <method name="SetDefaultPrivacyPolicy">
+      <arg name="entity" type="[Entity]" direction="in"/>
+      <arg name="policy" type="[defaultPrivacyPolicy]" direction="in"/>
+    </method>
+    <method name="EnityWhitelistAdd">
+      <arg name="entity" type="[Entity]" direction="in"/>
+      <arg name="whitelist" type="as" direction="in"/>
+    </method>
+    <method name="EnityBlacklistAdd">
+      <arg name="entity" type="[Entity]" direction="in"/>
+      <arg name="blacklist" type="as" direction="in"/>
+    </method>
+    <method name="GroupWhitelistAdd">
+      <arg name="groupId" type="s" direction="in"/>
+      <arg name="whitelist" type="as" direction="in"/>
+    </method>
+    <method name="GroupBlacklistAdd">
+      <arg name="groupId" type="s" direction="in"/>
+      <arg name="blacklist" type="as" direction="in"/>
+    </method>
+    <method name="EnityWhitelistDelete">
+      <arg name="entity" type="[Entity]" direction="in"/>
+      <arg name="whitelist" type="as" direction="in"/>
+    </method>
+    <method name="EnityBlacklistDelete">
+      <arg name="entity" type="[Entity]" direction="in"/>
+      <arg name="blacklist" type="as" direction="in"/>
+    </method>
+    <method name="GroupWhitelistDelete">
+      <arg name="groupId" type="s" direction="in"/>
+      <arg name="whitelist" type="as" direction="in"/>
+    </method>
+    <method name="GroupBlacklistDelete">
+      <arg name="groupId" type="s" direction="in"/>
+      <arg name="blacklist" type="as" direction="in"/>
+    </method>
+    <method name="GetGroupWhitelist">
+      <arg name="entity" type="[Entity]" direction="in"/>
+      <arg name="whitelist" type="as" direction="out"/>
+    </method>
+    <method name="GetGroupBlacklist">
+      <arg name="entity" type="[Entity]" direction="in"/>
+      <arg name="blacklist" type="as" direction="out"/>
+    </method>
+  </interface>
+</node>
