@@ -1,12 +1,15 @@
 <?xml version="1.0"?>
 <node xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://www.alljoyn.org/schemas/introspect.xsd">
   <interface name="org.alljoyn.locationservices">
-    <property name="Version" type="q" access="read"/>
+    <annotation name="org.alljoyn.Bus.Secure" value="true"/>
+    <property name="Version" type="q" access="read">
+      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/>
+    </property>
     <!-- The entityDescriptor fields provides a user understandable description of the entity,
          e.g. it can contain the information of groups -->
     <struct name="Entity">
       <field name="entityDescriptor" type="s"/>
-      <field name="entityMAC" type="s"/>
+      <field name="entityMac" type="s"/>
     </struct>
     <dict name="Group">
       <key type="s"/>
@@ -28,16 +31,16 @@
     <!-- Inject entity information into the provider.  The provider will inject the information, as necessary,
          to any active trackers.
     -->
-    <method name="updatePresenceInfo">
+    <method name="UpdatePresenceInfo">
       <arg name="entity" type="[Entity]" direction="in"/>
       <arg name="presenceInfo" type="b" direction="in"/>
     </method>
-    <method name="updateProximityInfo">
+    <method name="UpdateProximityInfo">
       <arg name="entity" type="[Entity]" direction="in"/>
       <arg name="referenceEntity" type="[Entity]" direction="in"/>
       <arg name="proximityInfo" type="d" direction="in"/>
     </method>
-    <method name="updateLocationInfo">
+    <method name="UpdateLocationInfo">
       <arg name="entity" type="[Entity]" direction="in"/>
       <arg name="locationInfo" type="d" direction="in"/>
     </method>
@@ -70,7 +73,7 @@
       <annotation name="org.freedesktop.DBus.Method.NoReply" value="true"/>
       <arg name="tracker" type="o" direction="in"/>
     </method>
-    <struct name="defaultPrivacyPolicy">
+    <struct name="DefaultPrivacyPolicy">
       <field name="presencePolicy" type="u"/>
       <field name="proximityPolicy" type="u"/>
       <field name="locationPolicy" type="u"/>
@@ -92,7 +95,7 @@
     -->
     <method name="SetDefaultPrivacyPolicy">
       <arg name="entity" type="[Entity]" direction="in"/>
-      <arg name="policy" type="[defaultPrivacyPolicy]" direction="in"/>
+      <arg name="policy" type="[DefaultPrivacyPolicy]" direction="in"/>
     </method>
     <method name="EnityWhitelistAdd">
       <arg name="entity" type="[Entity]" direction="in"/>

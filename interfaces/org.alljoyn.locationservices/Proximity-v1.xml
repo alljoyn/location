@@ -1,10 +1,13 @@
 <?xml version="1.0"?>
 <node xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://www.alljoyn.org/schemas/introspect.xsd">
-  <interface name="org.alljoyn.locationservices.proximity">
-    <property name="Version" type="q" access="read"/>
+  <interface name="org.alljoyn.locationservices.Proximity">
+    <annotation name="org.alljoyn.Bus.Secure" value="true"/>
+    <property name="Version" type="q" access="read">
+      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/>
+    </property>
     <struct name="Entity">
       <field name="entityId" type="s"/>
-      <field name="entityMAC" type="s"/>
+      <field name="entityMac" type="s"/>
     </struct>
     <!--
         subscribe for events that occur when firstEntity and secondEntity are in proximity.
@@ -40,7 +43,7 @@
     <method name="UnsubscribeEntityGeofenceTracking">
       <arg name="firstEntity" type="(ss)" direction="in"/>
       <arg name="secondEntity" type="(ss)" direction="in"/>
-      <arg name="Distance" type="i" direction="in"/>
+      <arg name="distance" type="i" direction="in"/>
     </method>
     <method name="UnsubscribeForAnyProximateEntity">
       <arg name="entity" type="[Entity]" direction="in"/>
@@ -77,7 +80,7 @@
       <arg name="distanceMultiplier" type="i" direction="in"/>
       <arg name="nearbyEntities" type="a[Entity]" direction="out"/>
     </method>
-    <signal name="proximity">
+    <signal name="ProximityChanged" sessioncast="true">
       <arg name="firstEntity" type="[Entity]" direction="out"/>
       <arg name="secondEntity" type="[Entity]" direction="out"/>
       <arg name="distance" type="i" direction="out"/>

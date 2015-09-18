@@ -10,18 +10,20 @@
 -->
 <node xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://www.alljoyn.org/schemas/introspect.xsd">
   <interface name="org.alljoyn.locationservices.LocationTracker">
+    <annotation name="org.alljoyn.Bus.Secure" value="true"/>
     <struct name="LocationEntity">
       <field name="entityDescriptor" type="s"/>
-      <field name="entityMAC" type="ay"/>
+      <field name="entityMac" type="ay"/>
       <field name="locationInfo" type="i"/>
     </struct>
-    <property name="Version" type="q" access="read"/>
+    <property name="Version" type="q" access="read">
+      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/>
+    </property>
     <property name="Matches" type="a[LocationEntity]" access="read">
       <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
     </property>
-    <property name="Filter" type="s" access="read"/>
-    <signal name="PropertiesChanged" sessioncast="true">
-      <arg name="entity" type="[LocationEntity]" direction="out"/>
-    </signal>
+    <property name="Filter" type="s" access="read">
+      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/>
+    </property>
   </interface>
 </node>

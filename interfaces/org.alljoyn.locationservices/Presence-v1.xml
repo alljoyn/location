@@ -1,10 +1,13 @@
 <?xml version="1.0"?>
 <node xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://www.alljoyn.org/schemas/introspect.xsd">
-  <interface name="org.alljoyn.locationservices.presence">
-    <property name="Version" type="q" access="read"/>
+  <interface name="org.alljoyn.locationservices.Presence">
+    <annotation name="org.alljoyn.Bus.Secure" value="true"/>
+    <property name="Version" type="q" access="read">
+      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/>
+    </property>
     <struct name="Entity">
       <field name="entityId" type="s"/>
-      <field name="entityMAC" type="s"/>
+      <field name="entityMac" type="s"/>
     </struct>
     <method name="SubscribeForEntity">
       <arg name="entity" type="[Entity]" direction="in"/>
@@ -24,7 +27,7 @@
       <arg name="entities" type="a[Entity]" direction="in"/>
     </method>
     <method name="UnsubscibeForEntityGroup">
-      <arg name="EntityGroup" type="s" direction="in"/>
+      <arg name="entityGroup" type="s" direction="in"/>
     </method>
     <method name="UnsubscribeAll">
     </method>
@@ -37,13 +40,13 @@
       <arg name="present" type="b" direction="out"/>
     </method>
     <method name="QueryGroupPresence">
-      <arg name="EntityGroup" type="s" direction="in"/>
+      <arg name="entityGroup" type="s" direction="in"/>
       <arg name="presentEntities" type="a[Entity]" direction="out"/>
     </method>
     <method name="QueryAllPresence">
       <arg name="presentEntities" type="a[Entity]" direction="out"/>
     </method>
-    <signal name="present">
+    <signal name="PresenceChanged" sessioncast="true">
       <arg name="entity" type="[Entity]" direction="out"/>
       <arg name="isPresent" type="b" direction="out"/>
     </signal>
