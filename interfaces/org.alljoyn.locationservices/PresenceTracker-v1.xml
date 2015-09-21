@@ -10,18 +10,29 @@
      Consumer should only pay attention to signals for trackers in which it is interested.
 -->
 <node xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://www.alljoyn.org/schemas/introspect.xsd">
-  <interface name="org.alljoyn.locationservices.PresenceTracker">
+  <interface name="org.alljoyn.locationservices.Presence.Tracker">
     <struct name="PresenceEntity">
       <field name="entityDescriptor" type="s"/>
       <field name="entityMAC" type="ay"/>
+      <field name="present" type="b"/>
+    </struct>
+    <struct name="PresenceFilter">
+      <field name="descriptorParser" type="s"/>
+      <field name="macParser" type="s"/>
     </struct>
     <property name="Version" type="q" access="read"/>
     <property name="Matches" type="a[PresenceEntity]" access="read">
       <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
     </property>
-    <property name="Filter" type="s" access="read"/>
+    <property name="Filter" type="[PresenceFilter]" access="read"/>
     <signal name="PropertiesChanged" sessioncast="true">
       <arg name="entity" type="[PresenceEntity]" direction="out"/>
     </signal>
+    <signal name="EndOfLife">
+      <arg name="secondsRemaining" type="u" direction="out"/>
+    </signal>
+    <method name="KeepAlive">
+      <annotation name="org.freedesktop.DBus.Method.NoReply" value="true"/>
+    </method>"
   </interface>
 </node>

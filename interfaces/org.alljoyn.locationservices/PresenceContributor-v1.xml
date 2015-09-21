@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<node xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://www.alljoyn.org/schemas/introspect.xsd">
+  <interface name="org.alljoyn.locationservices.Presence.Contributor">
+    <struct name="Entity">
+      <field name="entityDescriptor" type="s"/>
+      <field name="entityMAC" type="ay"/>
+    </struct>
+    <!-- Inject entity information into the provider.  
+         The provider will inject the information, as necessary,
+         to any active trackers.
+    -->
+    <method name="updatePresenceInfo">
+      <arg name="contributor" type="[Entity]" direction="in"/>
+      <arg name="entity" type="[Entity]" direction="in"/>
+      <arg name="isPresent" type="b" direction="in"/>
+    </method>
+
+  </interface>
+</node>
