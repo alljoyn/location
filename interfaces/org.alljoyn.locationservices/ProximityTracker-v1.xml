@@ -11,19 +11,29 @@
      Consumer should only pay attention to signals for trackers in which it is interested.
 -->
 <node xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://www.alljoyn.org/schemas/introspect.xsd">
-  <interface name="org.alljoyn.locationservices.DistanceTracker">
-    <struct name="ProximityEntity">
+  <interface name="org.alljoyn.locationservices.Proximity.DistanceTracker">
+    <struct name="Entity">
       <field name="entityDescriptor" type="s"/>
       <field name="entityMAC" type="ay"/>
-      <field name="distance" type="d"/>
+    </struct>
+    <struct name="DistanceFilter">
+      <field name="entity" type="[Entity]" />
+      <field name="discriptorParser" type="s"/>
+      <field name="macParser" type="s"/>
     </struct>
     <property name="Version" type="q" access="read"/>
     <property name="Matches" type="a[DistanceEntity]" access="read">
       <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
     </property>
-    <property name="Filter" type="s" access="read"/>
+    <property name="Filter" type="[DistanceFilter]" access="read"/>
     <signal name="PropertiesChanged" sessioncast="true">
-      <arg name="entity" type="[ProximityEntity]" direction="out"/>
+      <arg name="entity" type="[DistanceEntity]" direction="out"/>
     </signal>
+    <signal name="EndOfLife">
+      <arg name="secondsRemaining" type="u" direction="out"/>
+    </signal>
+    <method name="KeepAlive">
+      <annotation name="org.freedesktop.DBus.Method.NoReply" value="true"/>
+    </method>"
   </interface>
 </node>

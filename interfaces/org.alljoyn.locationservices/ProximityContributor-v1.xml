@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<node xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://www.alljoyn.org/schemas/introspect.xsd">
+  <interface name="org.alljoyn.locationservices.Distance.Contributor">
+    <struct name="Entity">
+      <field name="entityDescriptor" type="s"/>
+      <field name="entityMAC" type="ay"/>
+    </struct>
+    <!-- Inject entity information into the provider.  
+         The provider will inject the information, as necessary,
+         to any active trackers.
+    -->
+    <method name="updateDistanceInfo">
+      <arg name="contributor" type="[Entity]" direction="in"/>
+      <arg name="entity" type="[Entity]" direction="in"/>
+      <arg name="distance" type="d" direction="in"/>
+      <arg name="distanceMultiplier" type="i" direction="in"/>
+      <arg name="accuracy" type="i" direction="in"/>
+      <arg name="accuracyMultiplier" type="i" direction="in"/>
+    </method>
+
+  </interface>
+</node>
