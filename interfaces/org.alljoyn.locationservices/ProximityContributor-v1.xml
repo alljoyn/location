@@ -1,15 +1,27 @@
 <?xml version="1.0"?>
 <node xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://www.alljoyn.org/schemas/introspect.xsd">
   <interface name="org.alljoyn.locationservices.Distance.Contributor">
+    <description>
+      Interface to add information to the proximity service
+    </description>
+    <property name="Version" type="q" access="read">
+      <description language="en">Interface Version</description>
+      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
+    </property>
+    <annotation name="org.alljoyn.Bus.Secure" value="true" />
     <struct name="Entity">
+      <description language="en" >
+	The representation of a device in presence services
+      </description>
       <field name="entityDescriptor" type="s"/>
-      <field name="entityMAC" type="ay"/>
+      <field name="entityMac" type="ay"/>
     </struct>
-    <!-- Inject entity information into the provider.  
-         The provider will inject the information, as necessary,
-         to any active trackers.
-    -->
-    <method name="updateDistanceInfo">
+    <method name="UpdateDistanceInfo">
+      <description>
+	Inject entity information into the provider.  
+	The provider will inject the information, as necessary,
+	to any active trackers.
+      </description>
       <arg name="contributor" type="[Entity]" direction="in"/>
       <arg name="entity" type="[Entity]" direction="in"/>
       <arg name="distance" type="d" direction="in"/>

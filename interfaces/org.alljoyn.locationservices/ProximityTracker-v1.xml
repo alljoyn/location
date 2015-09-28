@@ -1,10 +1,7 @@
 <?xml version="1.0"?>
-<!-- Tracks the proximity of entities.  Updates are triggered only when the distance change of an existing
-     matching entity is detected and is for more than the proximity distance (measured in cm) in the subscribed
-     filter.
+<!--
      Properties
-     Version  = Interface version.
-     Matches  = Entities that match the subscribed filter.
+     Matches  =
      Filter = The filter used this tracker is referring to.
      Signals
      Emits PropertiesChanged signal (consumer OnUpdate) when an entity is added or removed from the Matches property.
@@ -12,27 +9,60 @@
 -->
 <node xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://www.alljoyn.org/schemas/introspect.xsd">
   <interface name="org.alljoyn.locationservices.Proximity.DistanceTracker">
+    <description>
+      Tracks the proximity of entities.  
+      Updates are triggered only when the distance change of an existing
+      matching entity is detected and is for more than the proximity distance 
+      (measured in cm) in the subscribed filter.
+    </description>
+    <property name="Version" type="q" access="read">
+      <description language="en">Interface Version</description>
+      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
+    </property>
+    <annotation name="org.alljoyn.Bus.Secure" value="true" />
     <struct name="Entity">
+      <description language="en" >
+       The representation of a device in presence services
+      </description>
       <field name="entityDescriptor" type="s"/>
-      <field name="entityMAC" type="ay"/>
+      <field name="entityMac" type="ay"/>
     </struct>
     <struct name="DistanceFilter">
+      <description language="en" >
+	A filter to match entities the application is interested in
+      </description>
       <field name="entity" type="[Entity]" />
       <field name="discriptorParser" type="s"/>
       <field name="macParser" type="s"/>
     </struct>
-    <property name="Version" type="q" access="read"/>
-    <property name="Matches" type="a[DistanceEntity]" access="read">
+    <property name="Matches" type="a[Entity]" access="read">
+      <description>
+	Entities that match the subscribed filter.
+      </description>
       <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
     </property>
-    <property name="Filter" type="[DistanceFilter]" access="read"/>
-    <signal name="PropertiesChanged" sessioncast="true">
-      <arg name="entity" type="[DistanceEntity]" direction="out"/>
+    <property name="Filter" type="[DistanceFilter]" access="read">
+     <description language="en" >
+       A filter to match entities the application is interested in
+     </description>
+     <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
+    </property>
+    <signal name="EntityChanged" sessioncast="true">
+      <description language="en">
+	The entity has has moved or entered or left the geofence
+      </description>
+      <arg name="entity" type="[Entity]" direction="out"/>
     </signal>
-    <signal name="EndOfLife">
+    <signal name="EndOfLifeThresholdReached" sessioncast="true">
+      <description language="en">
+	The threshold for reclaiming the filter has been crossed
+      </description>
       <arg name="secondsRemaining" type="u" direction="out"/>
     </signal>
     <method name="KeepAlive">
+      <description language="en">
+	Reset the keep alive timer on the filter
+      </description>
       <annotation name="org.freedesktop.DBus.Method.NoReply" value="true"/>
     </method>"
   </interface>

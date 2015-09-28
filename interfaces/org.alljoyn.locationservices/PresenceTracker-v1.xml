@@ -1,38 +1,65 @@
 <?xml version="1.0"?>
-<!-- Tracks the "presence" of entities.  Updates are triggered only when the actual present/not-present status
-     of an existing matching entity is detected.
-     Properties
-     Version  = Interface version.
-     Matches  = Entities that match the subscribed filter parsers.
-     Filter = The filter used this tracker is referring to.
+<!-- 
      Signals
      Emits PropertiesChanged signal (consumer OnUpdate) when an entity is added or removed from the Matches property.
      Consumer should only pay attention to signals for trackers in which it is interested.
 -->
 <node xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://www.alljoyn.org/schemas/introspect.xsd">
   <interface name="org.alljoyn.locationservices.Presence.Tracker">
-    <struct name="PresenceEntity">
+    <description language="en">
+      This interface tracks the presence of entities.  
+      Updates are triggered only when the actual present/not-present status
+     of an existing matching entity is detected.
+    </description> 
+   <property name="Version" type="q" access="read">
+     <description language="en">Interface Version</description>
+     <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
+   </property>
+   <annotation name="org.alljoyn.Bus.Secure" value="true" />
+   <struct name="PresenceEntity">
+     <description language="en" >
+       The representation of a device in presence services
+     </description>
       <field name="entityDescriptor" type="s"/>
-      <field name="entityMAC" type="ay"/>
+      <field name="entityMac" type="ay"/>
       <field name="present" type="b"/>
     </struct>
     <struct name="PresenceFilter">
+     <description language="en" >
+       A filter to match entities the application is interested in
+     </description>
       <field name="descriptorParser" type="s"/>
       <field name="macParser" type="s"/>
     </struct>
-    <property name="Version" type="q" access="read"/>
     <property name="Matches" type="a[PresenceEntity]" access="read">
+      <description language="en">
+	Entities that match the subscribed filter parsers.
+      </description>
       <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
     </property>
-    <property name="Filter" type="[PresenceFilter]" access="read"/>
-    <signal name="PropertiesChanged" sessioncast="true">
+    <property name="Filter" type="[PresenceFilter]" access="read">
+      <description language="en">
+	The filter used this tracker is referring to.
+      </description>
+     <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
+    </property>
+    <signal name="EntityChanged" sessioncast="true">
+      <description language="en">
+	The entity has entered or left the area
+      </description>
       <arg name="entity" type="[PresenceEntity]" direction="out"/>
     </signal>
-    <signal name="EndOfLife">
+    <signal name="EndOfLifeThresholdReached" sessioncast="true">
+      <description language="en">
+	The threshold for reclaiming the filter has been crossed
+      </description>
       <arg name="secondsRemaining" type="u" direction="out"/>
     </signal>
     <method name="KeepAlive">
       <annotation name="org.freedesktop.DBus.Method.NoReply" value="true"/>
+      <description language="en">
+	Reset the keep alive timer on the filter
+      </description>
     </method>"
   </interface>
 </node>

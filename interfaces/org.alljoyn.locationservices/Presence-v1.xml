@@ -1,39 +1,61 @@
 <?xml version="1.0"?>
 <node xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://www.alljoyn.org/schemas/introspect.xsd">
   <interface name="org.alljoyn.locationservices.Presence.Presence">
-   <property name="Version" type="q" access="read"/>
-    <struct name="PresenceEntity">
+    <description language="en">
+      This interface contains methods for applications to access the presence service data
+    </description> 
+   <property name="Version" type="q" access="read">
+     <description language="en">Interface Version</description>
+     <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
+   </property>
+   <annotation name="org.alljoyn.Bus.Secure" value="true" />
+   <struct name="PresenceEntity">
+     <description language="en" >
+       The representation of a device in presence services
+     </description>
       <field name="entityDescriptor" type="s"/>
-      <field name="entityMAC" type="ay"/>
+      <field name="entityMac" type="ay"/>
       <field name="present" type="b"/>
     </struct>
     <struct name="PresenceFilter">
+     <description language="en" >
+       A filter to match entities the application is interested in
+     </description>
       <field name="descriptorParser" type="s"/>
       <field name="macParser" type="s"/>
     </struct>
-    <!-- Request presence tracking of entities that match the filter parsers.  
-         Signals tagged with the returned tracker value are relevant; 
-         other signals should be ignored.
-    -->
     <method name="PresenceSubscribe">
+     <description language="en" >
+       Request presence tracking of entities that match the filter parsers.  
+       Signals tagged with the returned tracker value are relevant; 
+       other signals should be ignored.
+     </description>
       <arg name="filter" type="[PresenceFilter]" direction="in"/>
       <arg name="presenceTracker" type="o" direction="out"/>
     </method>
 
-    <!-- Query for all entities that match the passed filter -->
     <method name="QueryPresence">
+      <description language="en" >
+	Query for all entities that match the passed filter
+      </description>
       <arg name="filter" type="[PresenceFilter]" direction="in"/>
-      <arg name="presentEntities" type="a[presenceEntity]" direction="out"/>
+      <arg name="presentEntities" type="a[PresenceEntity]" direction="out"/>
     </method>
 
-    <!-- Convieniece method for quering a single entity - call QueryPresence with correct filter-->
     <method name="QueryPresenceEntity">
+      <description language="en" >
+	Convieniece method for quering a single entity
+	calls QueryPresence with correct filter
+      </description>
       <arg name="entity" type="[PresenceEntity]" direction="in"/>
       <arg name="present" type="b" direction="out"/>
     </method>
 
-    <!-- Convieniece method for quering all entities - calls QueryPresence with correct filter -->
     <method name="QueryPresenceAll">
+      <description language="en" >
+	Convieniece method for quering all entities
+	calls QueryPresence with correct filter
+      </description>
       <arg name="presentEntities" type="a[PresenceEntity]" direction="out"/>
     </method>
   </interface>
