@@ -58,7 +58,7 @@
     <method name="KeepAlive">
       <annotation name="org.freedesktop.DBus.Method.NoReply" value="true"/>
       <description language="en">
-	Reset the keep alive timer on the filter
+	Reset the the end of life timer.
       </description>
     </method>"
   </interface>
