@@ -9,25 +9,31 @@
     <description language="en">
       This interface tracks the presence of entities.  
       Updates are triggered only when the actual present/not-present status
-     of an existing matching entity is detected.
+      of an existing matching entity is detected.
     </description> 
-   <property name="Version" type="q" access="read">
-     <description language="en">Interface Version</description>
-     <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
-   </property>
-   <annotation name="org.alljoyn.Bus.Secure" value="true" />
-   <struct name="PresenceEntity">
-     <description language="en" >
-       The representation of a device in presence services
-     </description>
+    <property name="Version" type="q" access="read">
+      <description language="en">Interface Version</description>
+      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
+    </property>
+    <annotation name="org.alljoyn.Bus.Secure" value="true" />
+    <struct name="Entity">
+      <description language="en">
+	The representation of a device
+      </description>
       <field name="entityDescriptor" type="s"/>
       <field name="entityMac" type="ay"/>
+    </struct>
+    <struct name="PresenceEntity">
+      <description language="en" >
+	The representation of a device in presence services
+      </description>
+      <field name="entity" type=[Entity]"/>
       <field name="present" type="b"/>
     </struct>
     <struct name="PresenceFilter">
-     <description language="en" >
-       A filter to match entities the application is interested in
-     </description>
+      <description language="en" >
+	A filter to match entities the application is interested in
+      </description>
       <field name="descriptorParser" type="s"/>
       <field name="macParser" type="s"/>
     </struct>
@@ -58,7 +64,7 @@
     <method name="KeepAlive">
       <annotation name="org.freedesktop.DBus.Method.NoReply" value="true"/>
       <description language="en">
-	Reset the keep alive timer on the filter
+	Reset the the end of life timer.
       </description>
     </method>"
   </interface>
