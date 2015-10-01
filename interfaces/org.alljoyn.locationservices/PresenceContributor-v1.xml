@@ -17,7 +17,7 @@
       <field name="entityMac" type="ay"/>
     </struct>
     <method name="UpdatePresenceInfo">
-      <description language="en>
+      <description language="en">
 	Inject entity information into the provider.  
 	The provider will inject the information, as necessary,
 	to any active trackers.
