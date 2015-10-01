@@ -1,72 +1,89 @@
 <?xml version="1.0"?>
 <node xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://www.alljoyn.org/schemas/introspect.xsd">
-  <interface name="org.alljoyn.locationservices.Proximity.Distance">
-    <description language="en" >
-      This interface contains methods for applications to access the data of the proximity service
-    </description>		
-    <property name="Version" type="q" access="read">
-      <description language="en">Interface Version</description>
-      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
-    </property>
-    <annotation name="org.alljoyn.Bus.Secure" value="true" />
+  <interface name="org.alljoyn.locationservices.proximity">
+    <property name="Version" type="q" access="read"/>
     <struct name="Entity">
-     <description language="en" >
-       The representation of a device in presence services
-     </description>
       <field name="entityId" type="s"/>
-      <field name="entityMac" type="s"/>
+      <field name="entityMAC" type="s"/>
     </struct>
-    <struct name="ProximityFilter">
-     <description language="en" >
-       A filter to match entities the application is interested in
-     </description>
-      <field name="entity" type="[Entity]" />
-      <field name="discriptorParser" type="s"/>
-      <field name="macParser" type="s"/>
-    </struct>
-    <method name="ProximityDistanceSubscribe">
-      <description>
+    <!--
         Subscribe for events that occur when firstEntity and secondEntity are in proximity.
-        Events are only sent again if the distance change is  more than deltaDistance (measured in cm)
-      </description>
-      <arg name="filter" type="[ProximityFilter]" direction="in"/>
+        Events are only sent again if the proximity change is  more than deltaDistance (measured in cm)
+    -->
+    <method name="SubscribeEntityDistanceTracking">
+      <arg name="firstEntity" type="[Entity]" direction="in"/>
+      <arg name="secondEntity" type="[Entity]" direction="in"/>
       <arg name="distanceDelta" type="i" direction="in"/>
     </method>
-    <method name="ProximityGeofenceSubscribe">
-      <description>
+    <!--
         send a signal when the two entities are less than Distance from each other
         e.g, let me know when my son is near the fridge
-      </description>
-      <arg name="filter" type="[ProximityFilter]" direction="in"/>
+    -->
+    <method name="SubscribeEntityGeofenceTracking">
+      <arg name="firstEntity" type="[Entity]" direction="in"/>
+      <arg name="secondEntity" type="[Entity]" direction="in"/>
       <arg name="distance" type="i" direction="in"/>
     </method>
-    <method name="SubscribeForAnyProximateEntity">
-      <description language="en">
+    <!--
         send a notification when any other Entity is within a specified
         distance to the passed Entity
         e.g., let me know when anything gets near the fridge
-      </description>
+    -->
+    <method name="SubscribeForAnyProximateEntity">
       <arg name="entity" type="[Entity]" direction="in"/>
       <arg name="distance" type="i" direction="in"/>
-      <arg name="proximityTracker" type="o" direction="out"/>
     </method>
-
+    <method name="UnsubscribeEntityDistanceTracking">
+      <arg name="firstEntity" type="(ss)" direction="in"/>
+      <arg name="secondEntity" type="[Entity]" direction="in"/>
+    </method>
+    <method name="UnsubscribeEntityGeofenceTracking">
+      <arg name="firstEntity" type="(ss)" direction="in"/>
+      <arg name="secondEntity" type="(ss)" direction="in"/>
+      <arg name="Distance" type="i" direction="in"/>
+    </method>
+    <method name="UnsubscribeForAnyProximateEntity">
+      <arg name="entity" type="[Entity]" direction="in"/>
+    </method>
+    <!-- server side API -->
+    <method name="SetProximityDistance">
+      <arg name="firstEntity" type="[Entity]" direction="in"/>
+      <arg name="secondEntity" type="[Entity]" direction="in"/>
+      <arg name="distance" type="i" direction="in"/>
+      <arg name="distanceMultiplier" type="i" direction="in"/>
+      <arg name="accuracy" type="i" direction="in"/>
+      <arg name="accuracyMultiplier" type="i" direction="in"/>
+    </method>
+    <method name="SetDefaultServiceEntity">
+      <arg name="myEntity" type="[Entity]" direction="in"/>
+    </method>
+    <method name="SetDefaultProximityAccuracy">
+      <arg name="entity" type="[Entity]" direction="in"/>
+      <arg name="accuracy" type="i" direction="in"/>
+      <arg name="accuracyMultiplier" type="i" direction="in"/>
+    </method>
     <method name="QueryProximity">
-      <description language="en">
-	query the service for all entities that match the filter
-      </description>
-      <arg name="filter" type="ProximityFilter" direction="in"/>
-      <arg name="proximateEntites" type="a[Entity]" direction="out"/>
+      <arg name="firstEntity" type="[Entity]" direction="in"/>
+      <arg name="secondEntity" type="[Entity]" direction="in"/>
+      <arg name="distance" type="i" direction="out"/>
+      <arg name="distanceMultiplier" type="i" direction="out"/>
+      <arg name="accuracy" type="i" direction="out"/>
+      <arg name="accuracyMultiplier" type="i" direction="out"/>
     </method>
-
-    <method name="QueryAllProximityDistance">
-    <description>
-      Gets all the entities that are within a specified distance
-    </description>
+    <!-- gets all the entities that are within a specified distance -->
+    <method name="QueryAllProximity">
       <arg name="entity" type="[Entity]" direction="in"/>
       <arg name="distance" type="i" direction="in"/>
       <arg name="distanceMultiplier" type="i" direction="in"/>
       <arg name="nearbyEntities" type="a[Entity]" direction="out"/>
     </method>
+    <signal name="proximity">
+      <arg name="firstEntity" type="[Entity]" direction="out"/>
+      <arg name="secondEntity" type="[Entity]" direction="out"/>
+      <arg name="distance" type="i" direction="out"/>
+      <arg name="distanceMultiplier" type="i" direction="out"/>
+      <arg name="accuracy" type="i" direction="out"/>
+      <arg name="accuracyMultiplier" type="i" direction="out"/>
+    </signal>
   </interface>
 </node>
