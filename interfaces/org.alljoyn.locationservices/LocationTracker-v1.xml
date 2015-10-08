@@ -9,19 +9,84 @@
      Consumer should only pay attention to signals for trackers in which it is interested.
 -->
 <node xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://www.alljoyn.org/schemas/introspect.xsd">
-  <interface name="org.alljoyn.locationservices.LocationTracker">
+  <interface name="org.alljoyn.locationservices.Location.Tracker">
+    <description language="en">
+      This interface tracks the location of entities.  
+      Updates are triggered only when the actual location data has changed.
+    </description> 
+    <property name="Version" type="q" access="read">
+     <description language="en">Interface Version</description>
+     <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
+   </property>
+
     <struct name="LocationEntity">
+     <description language="en" >
+       The representation of a device in location services.
+     </description>
       <field name="entityDescriptor" type="s"/>
-      <field name="entityMAC" type="ay"/>
-      <field name="locationInfo" type="i"/>
+      <field name="entityMac" type="ay"/>
+      <field name="locationData" type="[LocationData]"/>
     </struct>
-    <property name="Version" type="q" access="read"/>
+    
+    <struct name="LocationData">
+      <description language="en" >
+       The representation of location data. 
+       The field origin defines the reference point (e.g. wgs84)
+     </description>
+      <field name="origin" type="s"/>
+      <field name="x" type="i"/>
+      <field name="y" type="i"/>
+      <field name="z" type="i"/>
+      <field name="horizontalAccuracy" type="i"/>
+      <field name="horizontalAccuracyMultiplier" type="i"/>
+      <field name="verticalAccuracy" type="i"/>
+      <field name="verticalAccuracyMultiplier" type="i"/>
+    </struct>
+
+    <struct name="LocationFilter">
+     <description language="en" >
+       A filter to match entities the application is interested in
+     </description>
+      <field name="descriptorParser" type="s"/>
+      <field name="macParser" type="s"/>
+    </struct>
+
     <property name="Matches" type="a[LocationEntity]" access="read">
+      <description language="en">
+        Entities that match the subscribed filter parsers.
+      </description>
       <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
     </property>
-    <property name="Filter" type="s" access="read"/>
-    <signal name="PropertiesChanged" sessioncast="true">
+
+    <property name="Filter" type="[LocationFilter]" access="read">
+      <description language="en">
+        The filter this tracker is referring to.
+      </description>
+      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
+    </property>
+
+    <signal name="EntityChanged" sessioncast="true">
+      <description language="en">
+        The entity has changed its location
+      </description>
       <arg name="entity" type="[LocationEntity]" direction="out"/>
     </signal>
+
+    <signal name="EndOfLifeThresholdReached" sessioncast="true">
+      <description language="en">
+        The threshold for reclaiming the filter has been crossed
+      </description>
+      <arg name="secondsRemaining" type="u" direction="out"/>
+    </signal>
+
+    <method name="KeepAlive">
+      <description language="en">
+        Reset the keep alive timer on the filter
+      </description>
+      <annotation name="org.freedesktop.DBus.Method.NoReply" value="true"/>
+    </method>"
   </interface>
 </node>
+
+
+
