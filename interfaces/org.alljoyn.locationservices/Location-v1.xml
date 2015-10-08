@@ -1,67 +1,60 @@
 <?xml version="1.0"?>
 <node xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://www.alljoyn.org/schemas/introspect.xsd">
-  <interface name="org.alljoyn.locationservices.location">
-    <property name="Version" type="q" access="read"/>
-    <struct name="Entity">
-      <field name="entityId" type="s"/>
-      <field name="entityMAC" type="s"/>
+  <interface name="org.alljoyn.locationservices.Location.Location">
+    <description language="en">
+      This interface contains methods for applications to access the location service data
+    </description> 
+  <property name="Version" type="q" access="read">
+    <description language="en">Interface Version</description>
+    <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
+  </property>
+  <annotation name="org.alljoyn.Bus.Secure" value="true" />
+
+    <struct name="LocationEntity">
+     <description language="en" >
+       The representation of a device in location services.
+     </description>
+      <field name="entityDescriptor" type="s"/>
+      <field name="entityMac" type="ay"/>
+      <field name="locationData" type="[LocationData]"/>
     </struct>
-    <struct name="wgs84Data">
-      <field name="longitude" type="i"/>
-      <field name="latitude" type="i"/>
-      <field name="altitude" type="i"/>
-    </struct>
-    <struct name="locationOriginData">
+    
+    <struct name="LocationData">
+      <description language="en" >
+       The representation of location data. 
+       The field origin defines the reference point (e.g. wgs84)
+     </description>
       <field name="origin" type="s"/>
       <field name="x" type="i"/>
       <field name="y" type="i"/>
       <field name="z" type="i"/>
+      <field name="horizontalAccuracy" type="i"/>
+      <field name="horizontalAccuracyMultiplier" type="i"/>
+      <field name="verticalAccuracy" type="i"/>
+      <field name="verticalAccuracyMultiplier" type="i"/>
     </struct>
-    <method name="SubscribeForEntityLocation">
-      <arg name="entity" type="[Entity]" direction="in"/>
-      <arg name="updateInterval" type="i" direction="in"/>
-      <arg name="distanceDelta" type="i" direction="in"/>
-      <arg name="distanceMultiplier" type="i" direction="in"/>
+    
+    <struct name="LocationFilter">
+     <description language="en" >
+       A filter to match entities the application is interested in
+     </description>
+      <field name="descriptorParser" type="s"/>
+      <field name="macParser" type="s"/>
+    </struct>
+
+    <method name="LocationSubscribe">
+     <description language="en" >
+       Request presence tracking of entities that match the filter parsers.  
+       Signals tagged with the returned tracker value are relevant; 
+       other signals should be ignored.
+     </description>
+      <arg name="filter" type="[LocationFilter]" direction="in"/>
+      <arg name="locationTracker" type="o" direction="out"/>
     </method>
-    <method name="SubscribeForEntyListLocation">
-      <arg name="entities" type="a[Entity]" direction="in"/>
-      <arg name="updateInterval" type="i" direction="in"/>
-      <arg name="distanceDelta" type="i" direction="in"/>
-      <arg name="distanceMultiplier" type="i" direction="in"/>
-      <!--- power is an enum of HIGH, LOW or UNSPECIFIED -->
-      <arg name="powerPreference" type="u" direction="in"/>
-      <!--  Accuracy is an enum of HIGH, LOW or UNPSECIFIED -->
-      <arg name="accuracyPreference" type="u" diretion="in"/>
-    </method>
-    <method name="UnsubscribeForEntityLocation">
-      <arg name="entity" type="[Entity]" direction="in"/>
-      <!--- power is an enum of HIGH, LOW or UNSPECIFIED -->
-      <arg name="powerPreference" type="u" direction="in"/>
-      <!--  Accuracy is an enum of HIGH, LOW or UNPSECIFIED -->
-      <arg name="accuracyPreference" type="u" diretion="in"/>
-    </method>
-    <method name="UnsubscribeForEntityListLocation">
-      <arg name="entities" type="a[Entity]" direction="in"/>
-      <!--- power is an enum of HIGH, LOW or UNSPECIFIED -->
-      <arg name="powerPreference" type="u" direction="in"/>
-      <!--  Accuracy is an enum of HIGH, LOW or UNPSECIFIED -->
-      <arg name="accuracyPreference" type="u" diretion="in"/>
-    </method>
-    <method name="SetLocation">
-      <arg name="entity" type="[Entity]" direction="in"/>
-      <arg name="location" type="[wgs84Data]" direction="in"/>
-      <arg name="horizontalAccuracy" type="i" direction="out"/>
-      <arg name="horizontalAccuracyMultiplier" type="i" direction="out"/>
-      <arg name="verticalAccuracy" type="i" direction="out"/>
-      <arg name="virticalAccuracyMultiplier" type="i" direction="out"/>
-    </method>
-    <method name="SetDefaultLocationAccuracy">
-      <arg name="entity" type="[Entity]" direction="in"/>
-      <arg name="horizontalAccuracy" type="i" direction="in"/>
-      <arg name="horizontalAccuracyMultiplier" type="i" direction="in"/>
-      <arg name="verticalAccuracy" type="i" direction="in"/>
-      <arg name="verticalAccuracyMultiplier" type="i" direction="in"/>
-    </method>
+
+    <!-- Do we need to add a LocationUnsubscribe method? -->
+
+   
     <method name="QueryLocation">
       <arg name="entity" type="[Entity]" direction="in"/>
       <arg name="location" type="[wgs84Data]" direction="out"/>
