@@ -1,28 +1,28 @@
 <?xml version="1.0"?>
 <node xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://www.alljoyn.org/schemas/introspect.xsd">
-  <interface name="org.alljoyn.locationservices.Location.Contributor">
+  <interface name="org.alljoyn.locationservices.Position.Contributor">
     <description>
-      Interface to add information to the Location Service
+      Interface to add information to the Position Service
     </description>
     <property name="Version" type="q" access="read">
       <description language="en">Interface Version</description>
       <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
     </property>
     <annotation name="org.alljoyn.Bus.Secure" value="true" />
-
-    <struct name="LocationEntity">
-     <description language="en" >
-       The representation of a device in the Location service
-     </description>
+    
+    <struct name="PositionEntity">
+      <description language="en" >
+	The representation of a device in the Position service
+      </description>
       <field name="entityDescriptor" type="s"/>
       <field name="entityMac" type="ay"/>
     </struct>
-
-    <struct name="LocationData">
+    
+    <struct name="PositionData">
       <description language="en" >
-       The representation of location data. 
-       The field origin defines the reference point (e.g. wgs84)
-     </description>
+	The representation of position data. 
+	The field origin defines the reference point (e.g. wgs84)
+      </description>
       <field name="origin" type="s"/>
       <field name="x" type="i"/>
       <field name="y" type="i"/>
@@ -32,28 +32,17 @@
       <field name="verticalAccuracy" type="i"/>
       <field name="verticalAccuracyMultiplier" type="i"/>
     </struct>
-
-    <method name="UpdateLocationInfo">
+    
+    <method name="UpdatePositionInfo">
       <description language="en">
 	Inject entity information into the provider.  
 	The provider will inject the information, as necessary,
 	to any active trackers.
       </description>
-      <arg name="contributor" type="[LocationEntity]" direction="in"/>
-      <arg name="entity" type="[LocationEntity]" direction="in"/>
-      <arg name="location" type="[LocationData]" direction="in"/>
+      <arg name="contributor" type="[PositionEntity]" direction="in"/>
+      <arg name="entity" type="[PositionEntity]" direction="in"/>
+      <arg name="position" type="[PositionData]" direction="in"/>
     </method>
-
-    <!--
-      Can we remove this method?
-    <method name="SetDefaultLocationAccuracy">
-      <arg name="entity" type="[Entity]" direction="in"/>
-      <arg name="horizontalAccuracy" type="i" direction="in"/>
-      <arg name="horizontalAccuracyMultiplier" type="i" direction="in"/>
-      <arg name="verticalAccuracy" type="i" direction="in"/>
-      <arg name="verticalAccuracyMultiplier" type="i" direction="in"/>
-    </method>
-  -->
 
   </interface>
 </node>

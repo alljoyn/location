@@ -1,18 +1,20 @@
 <?xml version="1.0"?>
 <node xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://www.alljoyn.org/schemas/introspect.xsd">
   <interface name="org.alljoyn.locationservices.Presence.Presence">
-    <description language="en">
-      This interface contains methods for applications to access the presence service data
-    </description> 
+    <annotation name="org.alljoyn.Bus.DocString.en"
+		value="This interface contains methods for applications to access the presence service data"
+    /> 
    <property name="Version" type="q" access="read">
-     <description language="en">Interface Version</description>
+     <annotation name="org.alljoyn.Bus.DocString.en"
+		 value="Interface Version"
+     />
      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
    </property>
    <annotation name="org.alljoyn.Bus.Secure" value="true" />
    <struct name="Entity">
-     <description language="en">
-       The representation of a device
-     </description>
+     <annotation name="org.alljoyn.Bus.DocString.en"
+       value="The representation of a device"
+     />
      <field name="entityDescriptor" type="s"/>
      <field name="entityMac" type="ay"/>
    </struct>
@@ -53,7 +55,7 @@
 	Convieniece method for quering a single entity
 	calls QueryPresence with correct filter
       </description>
-      <arg name="entity" type="[PresenceEntity]" direction="in"/>
+      <arg name="entity" type="[Entity]" direction="in"/>
       <arg name="present" type="b" direction="out"/>
     </method>
 

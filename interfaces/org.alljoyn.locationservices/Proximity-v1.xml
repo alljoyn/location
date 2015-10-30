@@ -11,10 +11,17 @@
     <annotation name="org.alljoyn.Bus.Secure" value="true" />
     <struct name="Entity">
      <description language="en" >
-       The representation of a device in presence services
+       The representation of a device
      </description>
       <field name="entityId" type="s"/>
       <field name="entityMac" type="s"/>
+    </struct>
+    <struct name="ProximityEntity" >
+      <description language="en" >
+	The representation of a device in the proximity service
+      </description>
+      <field name="entity" type="[Entity]"/>
+      <field name="distance" type="i" />
     </struct>
     <struct name="ProximityFilter">
      <description language="en" >
@@ -31,6 +38,7 @@
       </description>
       <arg name="filter" type="[ProximityFilter]" direction="in"/>
       <arg name="distanceDelta" type="i" direction="in"/>
+      <arg name="proximityTracker" type="o" direction="out"/>
     </method>
     <method name="ProximityGeofenceSubscribe">
       <description>
@@ -39,6 +47,7 @@
       </description>
       <arg name="filter" type="[ProximityFilter]" direction="in"/>
       <arg name="distance" type="i" direction="in"/>
+      <arg name="proximityTracker" type="o" direction="out"/>
     </method>
     <method name="SubscribeForAnyProximateEntity">
       <description language="en">
@@ -56,7 +65,7 @@
 	query the service for all entities that match the filter
       </description>
       <arg name="filter" type="ProximityFilter" direction="in"/>
-      <arg name="proximateEntites" type="a[Entity]" direction="out"/>
+      <arg name="proximateEntites" type="a[ProximityEntity]" direction="out"/>
     </method>
 
     <method name="QueryAllProximityDistance">
@@ -66,7 +75,7 @@
       <arg name="entity" type="[Entity]" direction="in"/>
       <arg name="distance" type="i" direction="in"/>
       <arg name="distanceMultiplier" type="i" direction="in"/>
-      <arg name="nearbyEntities" type="a[Entity]" direction="out"/>
+      <arg name="nearbyEntities" type="a[ProximityEntity]" direction="out"/>
     </method>
   </interface>
 </node>

@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!-- Tracks the "location" of entities.
+<!-- Tracks the "position" of entities.
      Properties
      Version  = Interface version.
      Matches  = Entities that match the subscribed filter.
@@ -9,19 +9,19 @@
      Consumer should only pay attention to signals for trackers in which it is interested.
 -->
 <node xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://www.alljoyn.org/schemas/introspect.xsd">
-  <interface name="org.alljoyn.locationservices.Location.Tracker">
+  <interface name="org.alljoyn.locationservices.Position.Tracker">
     <description language="en">
-      This interface tracks the location of entities.  
-      Updates are triggered only when the actual location data has changed.
+      This interface tracks the position of entities.  
+      Updates are triggered only when the actual position data has changed.
     </description> 
     <property name="Version" type="q" access="read">
      <description language="en">Interface Version</description>
      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
    </property>
 
-    <struct name="LocationData">
+    <struct name="PositionData">
       <description language="en" >
-       The representation of location data. 
+       The representation of position data. 
        The field origin defines the reference point (e.g. wgs84)
      </description>
       <field name="origin" type="s"/>
@@ -34,16 +34,16 @@
       <field name="verticalAccuracyMultiplier" type="i"/>
     </struct>
 
-    <struct name="LocationEntity">
+    <struct name="PositionEntity">
      <description language="en" >
-       The representation of a device in location services.
+       The representation of a device in position services.
      </description>
       <field name="entityDescriptor" type="s"/>
       <field name="entityMac" type="ay"/>
-      <field name="locationData" type="[LocationData]"/>
+      <field name="positionData" type="[PositionData]"/>
     </struct>
     
-    <struct name="LocationFilter">
+    <struct name="PositionFilter">
      <description language="en" >
        A filter to match entities the application is interested in
      </description>
@@ -51,14 +51,14 @@
       <field name="macParser" type="s"/>
     </struct>
 
-    <property name="Matches" type="a[LocationEntity]" access="read">
+    <property name="Matches" type="a[PositionEntity]" access="read">
       <description language="en">
         Entities that match the subscribed filter parsers.
       </description>
       <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
     </property>
 
-    <property name="Filter" type="[LocationFilter]" access="read">
+    <property name="Filter" type="[PositionFilter]" access="read">
       <description language="en">
         The filter this tracker is referring to.
       </description>
@@ -67,9 +67,9 @@
 
     <signal name="EntityChanged" sessioncast="true">
       <description language="en">
-        The entity has changed its location
+        The entity has changed its position
       </description>
-      <arg name="entity" type="[LocationEntity]" direction="out"/>
+      <arg name="entity" type="[PositionEntity]" direction="out"/>
     </signal>
 
     <signal name="EndOfLifeThresholdReached" sessioncast="true">

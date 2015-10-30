@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<node xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://www.alljoyn.org/schemas/introspect.xsd">
+  <interface name="org.alljoyn.locationservices.Position.Position">
+    <description language="en">
+      This interface contains methods for applications to access the position service data
+    </description> 
+    <property name="Version" type="q" access="read">
+      <description language="en">Interface Version</description>
+      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
+    </property>
+    <annotation name="org.alljoyn.Bus.Secure" value="true" />
+    
+    <struct name="PositionTime">
+      <description language="en">
+	The representation of time for the Position Service
+      </description>
+      <annotation name="org.alljoyn.Bos.DocString.En"
+		  value="The representation of time for the Position Service"
+		  />
+      <field name="year" type="q" />
+      <flled name="month" type="y" />
+      <field name="day" type="y" />
+      <field name="hour" type="y" />
+      <field name="second" type="y"/>
+      <field name="millisecond" type="q" />
+    </struct>
+    <struct name="PositionData">
+      <description language="en" >
+	The representation of position data. 
+	The field origin defines the reference point (e.g. wgs84)
+      </description>
+      <field name="origin" type="s"/>
+      <field name="x" type="i"/>
+      <field name="y" type="i"/>
+      <field name="z" type="i"/>
+      <field name="horizontalAccuracy" type="i"/>
+      <field name="horizontalAccuracyMultiplier" type="i"/>
+      <field name="verticalAccuracy" type="i"/>
+      <field name="verticalAccuracyMultiplier" type="i"/>
+      <field name="time" type="[PositionTime]"/>
+    </struct>
+    
+    <struct name="PositionEntity">
+      <description language="en" >
+	The representation of a device in position services.
+      </description>
+      <field name="entityDescriptor" type="s"/>
+      <field name="entityMac" type="ay"/>
+      <field name="positionData" type="[PositionData]"/>
+    </struct>
+    
+    <struct name="PositionFilter">
+      <description language="en" >
+	A filter to match entities the application is interested in
+      </description>
+      <field name="descriptorParser" type="s"/>
+      <field name="macParser" type="s"/>
+    </struct>
+    
+    <method name="PositionSubscribe">
+      <description language="en" >
+	Request presence tracking of entities that match the filter parsers.  
+	Signals tagged with the returned tracker value are relevant; 
+	other signals should be ignored.
+      </description>
+      <arg name="filter" type="[PositionFilter]" direction="in"/>
+      <arg name="positionTracker" type="o" direction="out"/>
+    </method>
+    
+    <!-- Do we need to add a PositionUnsubscribe method? -->
+    
+    
+    <method name="QueryPosition">
+      <description language="en" >
+        Query for all entities that match the passed filter
+      </description>
+      <arg name="filter" type="[PositionFilter]" direction="in"/>
+      <!--- power is an enum of HIGH, LOW or UNSPECIFIED -->
+      <arg name="powerPreference" type="u" direction="in"/>
+      <!--  Accuracy is an enum of HIGH, LOW or UNPSECIFIED -->
+      <arg name="accuracyPreference" type="u" direction="in"/>
+      <arg name="positionEntities" type="a[PositionEntity]" direction="out"/>
+    </method>
+    
+    <method name="QueryPositionEntity">
+      <description language="en" >
+        Query the position of a specific PositionEntity
+      </description>
+      <arg name="entity" type="[PositionEntity]" direction="in"/>
+      <arg name="position" type="[PositionData]" direction="out"/>
+      <!--- power is an enum of HIGH, LOW or UNSPECIFIED -->
+      <arg name="powerPreference" type="u" direction="in"/>
+      <!--  Accuracy is an enum of HIGH, LOW or UNPSECIFIED -->
+      <arg name="accuracyPreference" type="u" direction="in"/>
+    </method>
+    
+    <method name="QueryAllPosition">
+      <description language="en" >
+        Convieniece method for quering all entities. It calls QueryPosition with correct filter
+      </description>
+      <!--- power is an enum of HIGH, LOW or UNSPECIFIED -->
+      <arg name="powerPreference" type="u" direction="in"/>
+      <!--  Accuracy is an enum of HIGH, LOW or UNPSECIFIED -->
+      <arg name="accuracyPreference" type="u" direction="in"/>
+      <arg name="positionEntities" type="a[PositionEntity]" direction="out"/>
+    </method>
+    
+  </interface>
+</node>

@@ -27,6 +27,7 @@ This method returns a tracker.
 If a tracker exists that matches the filter it is returned,
 otherwise a new tracker object is created.
 Trackers have a lifetime and will be reaped after the lifetime is exceeded.
+
 Input arguments:
 
   * **filter** --- PresenceFilter --- A filter to match entities
@@ -37,40 +38,34 @@ Output arguments:
 
 Errors raised by this method:
 
- * org.alljoyn.example.Foo.Bar.Error.BazNotHome --- with some explanation if needed
+#### QueryPresence(filter) -> (presenceEntity)
+|                       |                                             |
+|-----------------------|---------------------------------------------|
 
-#### DoNothing()
+Input Arguments:
+
+* **filter** --- PresenceFilter --- The filter to be used to select the presence entities to return 
+
+Output Arguments:
+
+* **presenceEntity** --- PresenceEntity[] --- An array of presence entities that match the presenceFilter
+
+#### QueryPresenceEntity(entity) -> (isPresent)
 
 |                       |                                             |
 |-----------------------|---------------------------------------------|
-| Introduced in version | n (only add this line for n > 1)            |
-| Annotation            | org.freedesktop.DBus.Method.NoReply = true  |
 
-Description of the method. It does nothing, there are no inputs, no replies and
-no errors. So we can leave out all those sections below.
+This method is a convienence method, it creates a filter for the passed entity and calls QueryPresence
 
-### Signals
+Input Arguments
 
-#### SomethingHasBeenDone -> (what)
+* **entity** --- Entity --- An Entity
 
-|                       |                                   |
-|-----------------------|-----------------------------------|
-| Introduced in version | n (only add this line for n > 1)  |
-| Signal Type           | sessioncast                       |
+Output Arguments:
 
-(possible signal types are: unicast, sessioncast, sessionless, local broadcast,
-global broadcast. As per the Interface Design guidelines, the default signal
-type is sessioncast. If this signal is not sessioncast, make sure to explain
-the rationale.)
+* **isPresent** --- boolean --- true if the entity is present, false if it is not
 
-Description of the signal.
-
-Output arguments:
-
-  * **what** --- string --- textual description of what happened
-
-
-#### struct PresenceEntity
+#### struct Entity
 
 Entities are objects that are tracked by the location services.
 An entity may or may not be a member of the AllJoyn bus. 
@@ -84,12 +79,16 @@ Location Services uses both the unique identifier and the media specific identif
 entities. Anonymous entities will have a unique identifier of 00000000-0000-0000-0000-000000000000
 and a media specific identifier of their MAC address.
 
+  * **entityDescriptor** --- string --- A human readable description of the entity
+  * **entityMac** --- array of bytes --- the device specific ID (usually a MAC address)
+ 
+#### struct PresenceEntity
+
 A PresenceEntity is a representation of a device in the presence service. 
 It contains an entity (a human readable description and a unique id of the device) and a boolean
 representing wether the device is present. 
 
-  * **entityDescriptor** --- string --- A human readable description of the entity
-  * **entityMac** --- array of bytes --- the device specific ID (usually a MAC address)
+  * **entity** -- Entity -- The entity for the device
   * **present** ---boolean--- Wether the device is present or not.
 
 #### struct PresenceFilter
@@ -97,8 +96,8 @@ representing wether the device is present.
 A PresenceFilter is used to query or subscribe to information held in the presence service.
 The filter contains a regular expression to match against the entityDescriptor and a regular expression to match against the entityMac of a PresenceEntity.
 
-  * **descriptorParser** --- string --- A regular expression used to match the entityDescriptor 
-  * **macParser** --- string --- A regular expression used to match the entityMac
+  * **descriptorParser** --- string --- A regular expression used to match the entityDescriptor of entities
+  * **macParser** --- string --- A regular expression used to match the entityMac of entities
 
 
 ## References
