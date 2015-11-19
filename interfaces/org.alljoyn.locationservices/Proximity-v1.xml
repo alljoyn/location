@@ -28,8 +28,9 @@
        A filter to match entities the application is interested in
      </description>
       <field name="entity" type="[Entity]" />
-      <field name="discriptorParser" type="s"/>
-      <field name="macParser" type="s"/>
+      <!-- the filter is an entity with regular expressions in the field to match with entities in the location services />
+      <field name="filter" type="[Entity]" />
+      <field name="entities" type="a[Entity]" />
     </struct>
     <method name="ProximityDistanceSubscribe">
       <description>

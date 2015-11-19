@@ -22,15 +22,17 @@
      <description language="en" >
        The representation of a device in presence services
      </description>
-     <field name="entity" type=[Entity]"/>
+     <field name="entity" type="[Entity]"/>
      <field name="present" type="b"/>
    </struct>
    <struct name="PresenceFilter">
      <description language="en" >
        A filter to match entities the application is interested in
      </description>
-      <field name="descriptorParser" type="s"/>
-      <field name="macParser" type="s"/>
+     <!-- the filter parser is an entity filed with regular expressions for matching /> 
+     <field name="filterParser" type="[Entity]"/>
+     <!-- The entity list is a list of entities for matching />
+     <field name="entityList" type="a[Entity]"/>
     </struct>
     <method name="PresenceSubscribe">
      <description language="en" >

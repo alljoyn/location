@@ -34,21 +34,31 @@
       <description language="en" >
 	A filter to match entities the application is interested in
       </description>
-      <field name="descriptorParser" type="s"/>
-      <field name="macParser" type="s"/>
+      <!-- the filter parser is an entity filed with regular expressions for matching /> 
+      <field name="filterParser" type="[Entity]"/>
+      <!-- The entity list is a list of entities for matching />
+      <field name="entityList" type="a[Entity]"/>
     </struct>
+    <!-- change Matches to a method, this will reduce bus activity and number of signals 
     <property name="Matches" type="a[PresenceEntity]" access="read">
       <description language="en">
 	Entities that match the subscribed filter parsers.
       </description>
       <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
     </property>
+    ---/>
     <property name="Filter" type="[PresenceFilter]" access="read">
       <description language="en">
 	The filter used this tracker is referring to.
       </description>
      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
     </property>
+    <method name="matches">
+      <description>
+	Return the list of entities that match the filter
+      </description>
+      <arg name="entities" type="a[PreseneceEntity]" direction="out"/>
+    </method>
     <signal name="EntityChanged" sessioncast="true">
       <description language="en">
 	The entity has entered or left the area

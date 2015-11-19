@@ -14,14 +14,6 @@ If a KeepAlive is not recieved before the lifetime expires, the PreseneceTracker
 
 ### Properties
 
-#### Matches
-|                       |                                                                       |
-|-----------------------|-----------------------------------------------------------------------|
-| Type                  | Array of Entities                                                     |
-| Access                | read-only                                                             |
-| Annotation            | org.freedesktop.DBus.Property.EmitsChangedSignal = true               |
-
-This is the list of entities that match the filter that created the PresenceTracker.
 
 #### Filter
 |                       |                                                                       |
@@ -33,6 +25,17 @@ This is the list of entities that match the filter that created the PresenceTrac
 This is the filter that created the PresenceTracker.
 
 ### Methods
+
+#### Matches() -> presenceEntity[]
+|                       |                                                                       |
+|-----------------------|-----------------------------------------------------------------------|
+This returns the list of entities that match the filter that created the PresenceTracker.
+
+
+Output Arguments:
+
+* **presenceEntity** --- PresenceEntity[] --- An array of presence entities that match the presenceFilter
+
 
 #### KeepAlive()
 |                       |                                             |

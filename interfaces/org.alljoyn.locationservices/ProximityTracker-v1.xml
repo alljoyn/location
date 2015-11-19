@@ -27,31 +27,54 @@
       <field name="entityDescriptor" type="s"/>
       <field name="entityMac" type="ay"/>
     </struct>
-    <struct name="DistanceFilter">
+    <struct name="ProximityEntity" >
       <description language="en" >
-	A filter to match entities the application is interested in
+	The representation of a device in the proximity service
       </description>
-      <field name="entity" type="[Entity]" />
-      <field name="discriptorParser" type="s"/>
-      <field name="macParser" type="s"/>
+      <field name="entity" type="[Entity]"/>
+      <field name="distance" type="i" />
     </struct>
+    <struct name="ProximityFilter">
+     <description language="en" >
+       A filter to match entities the application is interested in
+     </description>
+      <field name="referenceEntity" type="[Entity]" />
+      <!-- the filter is an entity with regular expressions in the field to match with entities in the location services />
+      <field name="filter" type="[Entity]" />
+      <field name="entities" type="a[Entity]" />
+    </struct>
+    <property name="referenceEntity" type="Entity" access="read" >
+      <description>
+	The entity that this filter is tracking
+      </description>
+      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/>
+    </property>
+
+    <!-- change Matches to a method, this will reduce bus activity and number of signals 
     <property name="Matches" type="a[Entity]" access="read">
       <description>
 	Entities that match the subscribed filter.
       </description>
       <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
     </property>
-    <property name="Filter" type="[DistanceFilter]" access="read">
+    ---/>
+    <property name="Filter" type="[ProximityFilter]" access="read">
      <description language="en" >
        A filter to match entities the application is interested in
      </description>
      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
     </property>
+    <method name="matches">
+      <description>
+	Return the list of entities that match the filter
+      </description>
+      <arg name="entities" type="a[PreseneceEntity]" direction="out"/>
+    </method>
     <signal name="EntityChanged" sessioncast="true">
       <description language="en">
 	The entity has has moved or entered or left the geofence
       </description>
-      <arg name="entity" type="[Entity]" direction="out"/>
+      <arg name="entity" type="[ProximityEntity]" direction="out"/>
     </signal>
     <signal name="EndOfLifeThresholdReached" sessioncast="true">
       <description language="en">
