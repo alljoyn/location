@@ -18,6 +18,7 @@
      <description language="en">Interface Version</description>
      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
    </property>
+    <annotation name="org.alljoyn.Bus.Secure" value="true" />
 
     <struct name="PositionData">
       <description language="en" >

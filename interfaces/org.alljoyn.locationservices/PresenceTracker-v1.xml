@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!-- 
-     Signals
+Signals
      Emits PropertiesChanged signal (consumer OnUpdate) when an entity is added or removed from the Matches property.
      Consumer should only pay attention to signals for trackers in which it is interested.
 -->
@@ -34,30 +34,22 @@
       <description language="en" >
 	A filter to match entities the application is interested in
       </description>
-      <!-- the filter parser is an entity filed with regular expressions for matching /> 
+      <!-- the filter parser is an entity filed with regular expressions for matching --> 
       <field name="filterParser" type="[Entity]"/>
-      <!-- The entity list is a list of entities for matching />
+      <!-- The entity list is a list of entities for matching -->
       <field name="entityList" type="a[Entity]"/>
     </struct>
-    <!-- change Matches to a method, this will reduce bus activity and number of signals 
-    <property name="Matches" type="a[PresenceEntity]" access="read">
-      <description language="en">
-	Entities that match the subscribed filter parsers.
-      </description>
-      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
-    </property>
-    ---/>
     <property name="Filter" type="[PresenceFilter]" access="read">
       <description language="en">
 	The filter used this tracker is referring to.
       </description>
      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
     </property>
-    <method name="matches">
+    <method name="Matches">
       <description>
 	Return the list of entities that match the filter
       </description>
-      <arg name="entities" type="a[PreseneceEntity]" direction="out"/>
+      <arg name="entities" type="a[PresenceEntity]" direction="out"/>
     </method>
     <signal name="EntityChanged" sessioncast="true">
       <description language="en">
