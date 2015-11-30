@@ -39,21 +39,13 @@
       <!-- The entity list is a list of entities for matching />
       <field name="entityList" type="a[Entity]"/>
     </struct>
-    <!-- change Matches to a method, this will reduce bus activity and number of signals 
-    <property name="Matches" type="a[PresenceEntity]" access="read">
-      <description language="en">
-	Entities that match the subscribed filter parsers.
-      </description>
-      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
-    </property>
-    ---/>
     <property name="Filter" type="[PresenceFilter]" access="read">
       <description language="en">
 	The filter used this tracker is referring to.
       </description>
      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
     </property>
-    <method name="matches">
+    <method name="Matches">
       <description>
 	Return the list of entities that match the filter
       </description>

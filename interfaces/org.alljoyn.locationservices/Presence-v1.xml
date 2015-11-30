@@ -4,10 +4,17 @@
     <annotation name="org.alljoyn.Bus.DocString.en"
 		value="This interface contains methods for applications to access the presence service data"
     /> 
+    <description language="en">
+      "This interface contains methods for applications to access the presence service data"
+    </description>
+
    <property name="Version" type="q" access="read">
      <annotation name="org.alljoyn.Bus.DocString.en"
 		 value="Interface Version"
      />
+     <description language="en">
+       "Interface Version"
+     </description>
      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
    </property>
    <annotation name="org.alljoyn.Bus.Secure" value="true" />
@@ -15,6 +22,9 @@
      <annotation name="org.alljoyn.Bus.DocString.en"
        value="The representation of a device"
      />
+     <description language="en">
+       "The representation of a device"
+     </description>
      <field name="entityDescriptor" type="s"/>
      <field name="entityMac" type="ay"/>
    </struct>

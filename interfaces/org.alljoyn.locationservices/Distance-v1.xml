@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <node xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://www.alljoyn.org/schemas/introspect.xsd">
-  <interface name="org.alljoyn.locationservices.Proximity.Distance">
+  <interface name="org.alljoyn.locationservices.Distance.Distance">
     <description language="en" >
-      This interface contains methods for applications to access the data of the proximity service
+      This interface contains methods for applications to access the data of the distance service
     </description>		
     <property name="Version" type="q" access="read">
       <description language="en">Interface Version</description>
@@ -16,14 +16,14 @@
       <field name="entityId" type="s"/>
       <field name="entityMac" type="s"/>
     </struct>
-    <struct name="ProximityEntity" >
+    <struct name="DistanceEntity" >
       <description language="en" >
-	The representation of a device in the proximity service
+	The representation of a device in the distance service
       </description>
       <field name="entity" type="[Entity]"/>
       <field name="distance" type="i" />
     </struct>
-    <struct name="ProximityFilter">
+    <struct name="DistanceFilter">
      <description language="en" >
        A filter to match entities the application is interested in
      </description>
@@ -32,51 +32,41 @@
       <field name="filter" type="[Entity]" />
       <field name="entities" type="a[Entity]" />
     </struct>
-    <method name="ProximityDistanceSubscribe">
+    <method name="DistanceDistanceSubscribe">
       <description>
-        Subscribe for events that occur when firstEntity and secondEntity are in proximity.
+        Subscribe for events that occur when firstEntity and secondEntity are in distance.
         Events are only sent again if the distance change is  more than deltaDistance (measured in cm)
       </description>
-      <arg name="filter" type="[ProximityFilter]" direction="in"/>
+      <arg name="filter" type="[DistanceFilter]" direction="in"/>
       <arg name="distanceDelta" type="i" direction="in"/>
-      <arg name="proximityTracker" type="o" direction="out"/>
+      <arg name="distanceTracker" type="o" direction="out"/>
     </method>
-    <method name="ProximityGeofenceSubscribe">
+    <method name="DistanceGeofenceSubscribe">
       <description>
         send a signal when the two entities are less than Distance from each other
         e.g, let me know when my son is near the fridge
       </description>
-      <arg name="filter" type="[ProximityFilter]" direction="in"/>
+      <arg name="filter" type="[DistanceFilter]" direction="in"/>
       <arg name="distance" type="i" direction="in"/>
-      <arg name="proximityTracker" type="o" direction="out"/>
-    </method>
-    <method name="SubscribeForAnyProximateEntity">
-      <description language="en">
-        send a notification when any other Entity is within a specified
-        distance to the passed Entity
-        e.g., let me know when anything gets near the fridge
-      </description>
-      <arg name="entity" type="[Entity]" direction="in"/>
-      <arg name="distance" type="i" direction="in"/>
-      <arg name="proximityTracker" type="o" direction="out"/>
+      <arg name="distanceTracker" type="o" direction="out"/>
     </method>
 
-    <method name="QueryProximity">
+    <method name="QueryDistance">
       <description language="en">
 	query the service for all entities that match the filter
       </description>
-      <arg name="filter" type="ProximityFilter" direction="in"/>
-      <arg name="proximateEntites" type="a[ProximityEntity]" direction="out"/>
+      <arg name="filter" type="DistanceFilter" direction="in"/>
+      <arg name="proximateEntites" type="a[DistanceEntity]" direction="out"/>
     </method>
 
-    <method name="QueryAllProximityDistance">
+    <method name="QueryAllDistanceDistance">
     <description>
       Gets all the entities that are within a specified distance
     </description>
       <arg name="entity" type="[Entity]" direction="in"/>
       <arg name="distance" type="i" direction="in"/>
       <arg name="distanceMultiplier" type="i" direction="in"/>
-      <arg name="nearbyEntities" type="a[ProximityEntity]" direction="out"/>
+      <arg name="nearbyEntities" type="a[DistanceEntity]" direction="out"/>
     </method>
   </interface>
 </node>

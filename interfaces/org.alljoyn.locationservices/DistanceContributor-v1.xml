@@ -2,7 +2,7 @@
 <node xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://www.alljoyn.org/schemas/introspect.xsd">
   <interface name="org.alljoyn.locationservices.Distance.Contributor">
     <description>
-      Interface to add information to the proximity service
+      Interface to add information to the distance service
     </description>
     <property name="Version" type="q" access="read">
       <description language="en">Interface Version</description>
