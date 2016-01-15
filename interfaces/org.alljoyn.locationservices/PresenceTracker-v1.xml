@@ -1,72 +1,76 @@
 <?xml version="1.0"?>
-<!-- 
-Signals
-     Emits PropertiesChanged signal (consumer OnUpdate) when an entity is added or removed from the Matches property.
-     Consumer should only pay attention to signals for trackers in which it is interested.
--->
 <node xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://www.alljoyn.org/schemas/introspect.xsd">
   <interface name="org.alljoyn.locationservices.Presence.Tracker">
     <description language="en">
-      This interface tracks the presence of entities.  
-      Updates are triggered only when the actual present/not-present status
-      of an existing matching entity is detected.
+      This interface tracks the presence of entities that match the supplied filter
     </description> 
     <property name="Version" type="q" access="read">
       <description language="en">Interface Version</description>
       <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
     </property>
     <annotation name="org.alljoyn.Bus.Secure" value="true" />
+
     <struct name="Entity">
       <description language="en">
-	The representation of a device
+        Generic representation of a device
       </description>
       <field name="entityDescriptor" type="s"/>
-      <field name="entityMac" type="ay"/>
+      <field name="entityUuid" type="s"/>
+      <field name="entityMac" type="s"/>
     </struct>
+
     <struct name="PresenceEntity">
-      <description language="en" >
-	The representation of a device in presence services
+      <description language="en">
+        Presence services representation of device information
       </description>
       <field name="entity" type=[Entity]"/>
       <field name="present" type="b"/>
     </struct>
+
     <struct name="PresenceFilter">
       <description language="en" >
-	A filter to match entities the application is interested in
+        Service settings along with selection criteria for specifying entities of interest
       </description>
-      <!-- the filter parser is an entity filed with regular expressions for matching --> 
-      <field name="filterParser" type="[Entity]"/>
+      <!-- the entity parser is an entity filed with regular expressions for matching --> 
+      <field name="entityParser" type="[Entity]"/>
       <!-- The entity list is a list of entities for matching -->
       <field name="entityList" type="a[Entity]"/>
     </struct>
+
     <property name="Filter" type="[PresenceFilter]" access="read">
       <description language="en">
-	The filter used this tracker is referring to.
+        The presence filter configured for this tracker
       </description>
-     <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
+     <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/>
     </property>
+
     <method name="Matches">
-      <description>
-	Return the list of entities that match the filter
+      <description language="en">
+        Return the list of entities that match the filter entity selection criteria
       </description>
       <arg name="entities" type="a[PresenceEntity]" direction="out"/>
     </method>
+
     <signal name="EntityChanged" sessioncast="true">
       <description language="en">
-	The entity has entered or left the area
+        The entity has entered or left the area
       </description>
+      <arg name="tracker" type="o" direction="out"/>
       <arg name="entity" type="[PresenceEntity]" direction="out"/>
     </signal>
+
     <signal name="EndOfLifeThresholdReached" sessioncast="true">
       <description language="en">
-	The threshold for reclaiming the filter has been crossed
+        The threshold for reclaiming the filter has been crossed
       </description>
+      <arg name="tracker" type="o" direction="out"/>
       <arg name="secondsRemaining" type="u" direction="out"/>
     </signal>
+
     <method name="KeepAlive">
       <annotation name="org.freedesktop.DBus.Method.NoReply" value="true"/>
       <description language="en">
-	Reset the the end of life timer.
+        Reset the the end of life timer
       </description>
     </method>"
   </interface>

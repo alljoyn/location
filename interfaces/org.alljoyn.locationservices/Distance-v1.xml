@@ -6,67 +6,59 @@
     </description>		
     <property name="Version" type="q" access="read">
       <description language="en">Interface Version</description>
-      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
+      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/>
     </property>
     <annotation name="org.alljoyn.Bus.Secure" value="true" />
+
     <struct name="Entity">
-     <description language="en" >
-       The representation of a device
-     </description>
-      <field name="entityId" type="s"/>
+      <description language="en">
+        Generic representation of a device
+      </description>
+      <field name="entityDescriptor" type="s"/>
+      <field name="entityUuid" type="s"/>
       <field name="entityMac" type="s"/>
     </struct>
+
     <struct name="DistanceEntity" >
-      <description language="en" >
-	The representation of a device in the distance service
+      <description language="en">
+        Distance services representation of device information
       </description>
       <field name="entity" type="[Entity]"/>
-      <field name="distance" type="i" />
+      <field name="distance" type="d" />
+      <field name="distanceMultiplier" type="i" />
+      <field name="accuracy" type="i" />
+      <field name="accuracyMultiplier" type="i" />
     </struct>
+
     <struct name="DistanceFilter">
-     <description language="en" >
-       A filter to match entities the application is interested in
-     </description>
-      <field name="entity" type="[Entity]" />
-      <!-- the filter is an entity with regular expressions in the field to match with entities in the location services -->
-      <field name="filter" type="[Entity]" />
-      <field name="entities" type="a[Entity]" />
+      <description language="en">
+        Service settings along with selection criteria for specifying entities of interest
+      </description>
+      <!-- the reference entity is the entity from which distances to other entites are measured -->
+      <field name="referenceEntity" type="[Entity]"/>    
+      <!-- the entity parser is an entity filled with regular expressions for matching --> 
+      <field name="entityParser" type="[Entity]"/>
+      <!-- The entity list is a list of entities for matching -->
+      <field name="entityList" type="a[Entity]"/>
     </struct>
-    <method name="DistanceDistanceSubscribe">
-      <description>
+
+    <method name="DistanceSubscribe">
+      <description language="en">
         Subscribe for events that occur when firstEntity and secondEntity are in distance.
         Events are only sent again if the distance change is  more than deltaDistance (measured in cm)
       </description>
-      <arg name="filter" type="[DistanceFilter]" direction="in"/>
-      <arg name="distanceDelta" type="i" direction="in"/>
-      <arg name="distanceTracker" type="o" direction="out"/>
-    </method>
-    <method name="DistanceGeofenceSubscribe">
-      <description>
-        send a signal when the two entities are less than Distance from each other
-        e.g, let me know when my son is near the fridge
-      </description>
-      <arg name="filter" type="[DistanceFilter]" direction="in"/>
-      <arg name="distance" type="i" direction="in"/>
+      <arg name="distanceFilter" type="[DistanceFilter]" direction="in"/>
+      <arg name="distanceDelta" type="d" direction="in"/>
       <arg name="distanceTracker" type="o" direction="out"/>
     </method>
 
     <method name="QueryDistance">
       <description language="en">
-	query the service for all entities that match the filter
+        Query for distance information based on the supplied filter
       </description>
-      <arg name="filter" type="DistanceFilter" direction="in"/>
-      <arg name="proximateEntites" type="a[DistanceEntity]" direction="out"/>
+      <arg name="distanceFilter" type="[DistanceFilter]" direction="in"/>
+      <arg name="distanceEntites" type="a[DistanceEntity]" direction="out"/>
     </method>
 
-    <method name="QueryAllDistanceDistance">
-    <description>
-      Gets all the entities that are within a specified distance
-    </description>
-      <arg name="entity" type="[Entity]" direction="in"/>
-      <arg name="distance" type="i" direction="in"/>
-      <arg name="distanceMultiplier" type="i" direction="in"/>
-      <arg name="nearbyEntities" type="a[DistanceEntity]" direction="out"/>
-    </method>
   </interface>
 </node>

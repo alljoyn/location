@@ -1,16 +1,8 @@
 <?xml version="1.0"?>
-<!--
-     Properties
-     Matches  =
-     Filter = The filter used this tracker is referring to.
-     Signals
-     Emits PropertiesChanged signal (consumer OnUpdate) when an entity is added or removed from the Matches property.
-     Consumer should only pay attention to signals for trackers in which it is interested.
--->
 <node xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://www.alljoyn.org/schemas/introspect.xsd">
   <interface name="org.alljoyn.locationservices.Distance.DistanceTracker">
-    <description>
-      Tracks the distance of entities.  
+    <description language="en">
+      This interface tracks the distance between a reference entity and other entities that match the supplied filter
       Updates are triggered only when the distance change of an existing
       matching entity is detected and is for more than the proximity distance 
       (measured in cm) in the subscribed filter.
@@ -20,28 +12,37 @@
       <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
     </property>
     <annotation name="org.alljoyn.Bus.Secure" value="true" />
+
     <struct name="Entity">
-      <description language="en" >
-       The representation of a device in presence services
+      <description language="en">
+        Generic representation of a device
       </description>
       <field name="entityDescriptor" type="s"/>
-      <field name="entityMac" type="ay"/>
+      <field name="entityUuid" type="s"/>
+      <field name="entityMac" type="s"/>
     </struct>
-    <struct name="DistanceEntity" >
-      <description language="en" >
-	The representation of a device in the distance service
+
+    <struct name="DistanceEntity">
+      <description language="en">
+        Distance services representation of device information
       </description>
       <field name="entity" type="[Entity]"/>
-      <field name="distance" type="i" />
+      <field name="distance" type="d"/>
+      <field name="distanceMultiplier" type="i" />
+      <field name="accuracy" type="i" />
+      <field name="accuracyMultiplier" type="i" />
     </struct>
+
     <struct name="DistanceFilter">
-     <description language="en" >
-       A filter to match entities the application is interested in
-     </description>
-      <field name="referenceEntity" type="[Entity]" />
-      <!-- the filter is an entity with regular expressions in the field to match with entities in the location services -->
-      <field name="filterParser" type="[Entity]" />
-      <field name="entityList" type="a[Entity]" />
+      <description language="en">
+        Service settings along with selection criteria for specifying entities of interest
+      </description>
+      <!-- the reference entity is the entity from which distances to other entites are measured -->
+      <field name="referenceEntity" type="[Entity]"/>
+      <!-- the entity parser is an entity filled with regular expressions for matching --> 
+      <field name="entityParser" type="[Entity]"/>
+      <!-- The entity list is a list of entities for matching -->
+      <field name="entityList" type="a[Entity]"/>
     </struct>
     <property name="ReferenceEntity" type="Entity" access="read" >
       <description>
@@ -49,33 +50,46 @@
       </description>
       <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/>
     </property>
-    <property name="Filter" type="[DistanceFilter]" access="read">
-     <description language="en" >
-       A filter to match entities the application is interested in
-     </description>
-     <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
+    <property name="Filter" type="[DistanceFilter]" access="read" >
+      <description language="en">
+        The distance filter configured for this tracker
+      </description>
+      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/>
     </property>
+
+    <property name="Delta" type="d" access="read">
+      <description language="en">
+        The distance delta configured for this tracker  
+      </description>
+     <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/>
+    </property>
+
     <method name="Matches">
-      <description>
-	Return the list of entities that match the filter
+      <description language="en">
+        Return the list of entities that match the filter entity selection criteria
       </description>
       <arg name="entities" type="a[DistanceEntity]" direction="out"/>
     </method>
+
     <signal name="EntityChanged" sessioncast="true">
       <description language="en">
-	The entity has has moved or entered or left the geofence
+        The distance from the reference entity has changed by at least the configured delta amount
       </description>
+      <arg name="tracker" type="o" direction="out"/>
       <arg name="entity" type="[DistanceEntity]" direction="out"/>
     </signal>
+
     <signal name="EndOfLifeThresholdReached" sessioncast="true">
       <description language="en">
-	The threshold for reclaiming the filter has been crossed
+        The threshold for reclaiming the filter has been crossed
       </description>
+      <arg name="tracker" type="o" direction="out"/>
       <arg name="secondsRemaining" type="u" direction="out"/>
     </signal>
+
     <method name="KeepAlive">
       <description language="en">
-	Reset the keep alive timer on the filter
+        Reset the keep alive timer on the filter
       </description>
       <annotation name="org.freedesktop.DBus.Method.NoReply" value="true"/>
     </method>"

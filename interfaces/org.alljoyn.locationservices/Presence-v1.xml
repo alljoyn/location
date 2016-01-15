@@ -2,81 +2,68 @@
 <node xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://www.alljoyn.org/schemas/introspect.xsd">
   <interface name="org.alljoyn.locationservices.Presence.Presence">
     <annotation name="org.alljoyn.Bus.DocString.en"
-		value="This interface contains methods for applications to access the presence service data"
+		value="This interface contains methods for applications to access the presence services data"
     /> 
     <description language="en">
-      "This interface contains methods for applications to access the presence service data"
+      This interface contains methods for applications to access the presence services data
     </description>
 
-   <property name="Version" type="q" access="read">
-     <annotation name="org.alljoyn.Bus.DocString.en"
-		 value="Interface Version"
-     />
-     <description language="en">
-       "Interface Version"
-     </description>
-     <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
-   </property>
-   <annotation name="org.alljoyn.Bus.Secure" value="true" />
-   <struct name="Entity">
-     <annotation name="org.alljoyn.Bus.DocString.en"
-       value="The representation of a device"
-     />
-     <description language="en">
-       "The representation of a device"
-     </description>
-     <field name="entityDescriptor" type="s"/>
-     <field name="entityMac" type="ay"/>
-   </struct>
-   <struct name="PresenceEntity">
-     <description language="en" >
-       The representation of a device in presence services
-     </description>
-     <field name="entity" type="[Entity]"/>
-     <field name="present" type="b"/>
-   </struct>
-   <struct name="PresenceFilter">
-     <description language="en" >
-       A filter to match entities the application is interested in
-     </description>
-     <!-- the filter parser is an entity filed with regular expressions for matching --> 
-     <field name="filterParser" type="[Entity]"/>
-     <!-- The entity list is a list of entities for matching -->
-     <field name="entityList" type="a[Entity]"/>
+    <property name="Version" type="q" access="read">
+      <annotation name="org.alljoyn.Bus.DocString.en"
+        value="Interface Version"
+      />
+      <description language="en">
+        Interface Version
+      </description>
+      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/>
+    </property>
+    <annotation name="org.alljoyn.Bus.Secure" value="true" />
+
+    <struct name="Entity">
+      <annotation name="org.alljoyn.Bus.DocString.en"
+        value="Generic representation of a device"
+      />
+      <description language="en">
+        Generic representation of a device
+      </description>
+      <field name="entityDescriptor" type="s"/>
+      <field name="entityUuid" type="s"/>
+      <field name="entityMac" type="s"/>
     </struct>
+
+    <struct name="PresenceEntity">
+      <description language="en">
+        Presence services representation of device information
+      </description>
+      <field name="entity" type="[Entity]"/>
+      <field name="present" type="b"/>
+    </struct>
+
+    <struct name="PresenceFilter">
+      <description language="en">
+        Service settings along with selection criteria for specifying entities of interest
+      </description>
+      <!-- the entity parser is an entity filed with regular expressions for matching --> 
+      <field name="entityParser" type="[Entity]"/>
+      <!-- The entity list is a list of entities for matching -->
+      <field name="entityList" type="a[Entity]"/>
+    </struct>
+
     <method name="PresenceSubscribe">
-     <description language="en" >
-       Request presence tracking of entities that match the filter parsers.  
-       Signals tagged with the returned tracker value are relevant; 
-       other signals should be ignored.
+     <description language="en">
+       Request presence tracking based on the supplied filter
      </description>
-      <arg name="filter" type="[PresenceFilter]" direction="in"/>
+      <arg name="presenceFilter" type="[PresenceFilter]" direction="in"/>
       <arg name="presenceTracker" type="o" direction="out"/>
     </method>
 
     <method name="QueryPresence">
-      <description language="en" >
-	Query for all entities that match the passed filter
+      <description language="en">
+        Query for presence information based on the supplied filter
       </description>
-      <arg name="filter" type="[PresenceFilter]" direction="in"/>
-      <arg name="presentEntities" type="a[PresenceEntity]" direction="out"/>
+      <arg name="presenceFilter" type="[PresenceFilter]" direction="in"/>
+      <arg name="presenceEntities" type="a[PresenceEntity]" direction="out"/>
     </method>
 
-    <method name="QueryPresenceEntity">
-      <description language="en" >
-	Convieniece method for quering a single entity
-	calls QueryPresence with correct filter
-      </description>
-      <arg name="entity" type="[Entity]" direction="in"/>
-      <arg name="present" type="b" direction="out"/>
-    </method>
-
-    <method name="QueryPresenceAll">
-      <description language="en" >
-	Convieniece method for quering all entities
-	calls QueryPresence with correct filter
-      </description>
-      <arg name="presentEntities" type="a[PresenceEntity]" direction="out"/>
-    </method>
   </interface>
 </node>

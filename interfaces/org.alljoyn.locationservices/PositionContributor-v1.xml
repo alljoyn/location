@@ -2,7 +2,7 @@
 <node xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://www.alljoyn.org/schemas/introspect.xsd">
   <interface name="org.alljoyn.locationservices.Position.Contributor">
     <description>
-      Interface to add information to the Position Service
+      Interface to add position information to provider services
     </description>
     <property name="Version" type="q" access="read">
       <description language="en">Interface Version</description>
@@ -10,18 +10,34 @@
     </property>
     <annotation name="org.alljoyn.Bus.Secure" value="true" />
     
-    <struct name="PositionEntity">
+    <struct name="Entity">
       <description language="en" >
-	The representation of a device in the Position service
+        Generic representation of a device
       </description>
       <field name="entityDescriptor" type="s"/>
-      <field name="entityMac" type="ay"/>
+      <field name="entityUuid" type="s"/>
+      <field name="entityMac" type="s"/>
+    </struct>
+
+    <struct name="PositionTime">
+      <description language="en">
+        Representation of time data
+      </description>
+      <annotation name="org.alljoyn.Bos.DocString.En"
+        value="The representation of time for the Position Service"
+      />
+      <field name="year" type="q" />
+      <flled name="month" type="y" />
+      <field name="day" type="y" />
+      <field name="hour" type="y" />
+      <field name="second" type="y"/>
+      <field name="millisecond" type="q" />
     </struct>
     
     <struct name="PositionData">
       <description language="en" >
-	The representation of position data. 
-	The field origin defines the reference point (e.g. wgs84)
+        Representation of position data 
+        The field origin defines the reference point (e.g. wgs84)
       </description>
       <field name="origin" type="s"/>
       <field name="x" type="i"/>
@@ -31,16 +47,16 @@
       <field name="horizontalAccuracyMultiplier" type="i"/>
       <field name="verticalAccuracy" type="i"/>
       <field name="verticalAccuracyMultiplier" type="i"/>
+      <field name="time" type="[PositionTime]"/>
     </struct>
     
     <method name="UpdatePositionInfo">
+      <annotation name="org.freedesktop.DBus.Method.NoReply" value="true"/>
       <description language="en">
-	Inject entity information into the provider.  
-	The provider will inject the information, as necessary,
-	to any active trackers.
+        Inject entity information into the provider 
       </description>
-      <arg name="contributor" type="[PositionEntity]" direction="in"/>
-      <arg name="entity" type="[PositionEntity]" direction="in"/>
+      <arg name="contributor" type="[Entity]" direction="in"/>
+      <arg name="entity" type="[Entity]" direction="in"/>
       <arg name="position" type="[PositionData]" direction="in"/>
     </method>
 

@@ -9,18 +9,20 @@
       <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
     </property>
     <annotation name="org.alljoyn.Bus.Secure" value="true" />
+
     <struct name="Entity">
       <description language="en" >
-	The representation of a device in presence services
+        Generic representation of a device
       </description>
       <field name="entityDescriptor" type="s"/>
-      <field name="entityMac" type="ay"/>
+      <field name="entityUuid" type="s"/>
+      <field name="entityMac" type="s"/>
     </struct>
+
     <method name="UpdateDistanceInfo">
+      <annotation name="org.freedesktop.DBus.Method.NoReply" value="true"/>
       <description>
-	Inject entity information into the provider.  
-	The provider will inject the information, as necessary,
-	to any active trackers.
+        Inject entity information into the provider 
       </description>
       <arg name="contributor" type="[Entity]" direction="in"/>
       <arg name="entity" type="[Entity]" direction="in"/>
