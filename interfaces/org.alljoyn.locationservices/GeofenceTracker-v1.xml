@@ -1,81 +1,84 @@
 <?xml version="1.0"?>
-<!--
-     Properties
-     Matches  =
-     Filter = The filter used this tracker is referring to.
-     Signals
-     Emits PropertiesChanged signal (consumer OnUpdate) when an entity is added or removed from the Matches property.
-     Consumer should only pay attention to signals for trackers in which it is interested.
--->
 <node xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://www.alljoyn.org/schemas/introspect.xsd">
-  <interface name="org.alljoyn.locationservices.Distance.GeofenceTracker">
-    <description>
-      Tracks when entities enter or leave a geofence
-      Updates are triggered only when the distance change of an existing
-      matching entity is detected and enters or leaves the geofence
-      (measured in cm) in the subscribed filter.
+  <interface name="org.alljoyn.locationservices.Geofence.GeofenceTracker">
+    <description language="en">
+      This interface tracks fenceline crossings around a reference entity by other entities that match the supplied filter
     </description>
     <property name="Version" type="q" access="read">
       <description language="en">Interface Version</description>
       <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
     </property>
     <annotation name="org.alljoyn.Bus.Secure" value="true" />
+
     <struct name="Entity">
-      <description language="en" >
-       The representation of a device in presence services
+      <description language="en">
+        Generic representation of a device
       </description>
       <field name="entityDescriptor" type="s"/>
-      <field name="entityMac" type="ay"/>
+      <field name="entityUuid" type="s"/>
+      <field name="entityMac" type="s"/>
     </struct>
-    <struct name="GeofenceEntity" >
-      <description language="en" >
-	The representation of a device in the geofence service
+
+    <struct name="GeofenceEntity">
+      <description language="en">
+        Geofence services representation of device information
       </description>
       <field name="entity" type="[Entity]"/>
-      <field name="isWithin" type="b" />
+      <field name="withinFenceline" type="b"/>
     </struct>
+
     <struct name="GeofenceFilter">
-     <description language="en" >
-       A filter to match entities the application is interested in
-     </description>
-      <field name="referenceEntity" type="[Entity]" />
-      <!-- the filter is an entity with regular expressions in the field to match with entities in the location services -->
-      <field name="filterParser" type="[Entity]" />
-      <field name="entityList" type="a[Entity]" />
+      <description language="en">
+        Service settings along with selection criteria for specifying entities of interest
+      </description>
+      <!-- the reference fenceline is the distance around the reference entity that forms the geofence boundary -->
+      <field name="referenceFenceline" type="d"/>    
+      <!-- the reference entity is the entity from which distances to other entites are measured -->
+      <field name="referenceEntity" type="[Entity]"/>    
+      <!-- the entity parser is an entity filled with regular expressions for matching --> 
+      <field name="entityParser" type="[Entity]"/>
+      <!-- The entity list is a list of entities for matching -->
+      <field name="entityList" type="a[Entity]"/>
     </struct>
-    <property name="ReferenceEntity" type="Entity" access="read" >
+   <property name="ReferenceEntity" type="Entity" access="read" >
       <description>
 	The entity that this filter is tracking
       </description>
       <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/>
     </property>
-    <property name="Filter" type="[GeofenceFilter]" access="read">
-     <description language="en" >
-       A filter to match entities the application is interested in
-     </description>
-     <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
+    <property name="Filter" type="[GeofenceFilter]" access="read" >
+      <description language="en">
+        The geofence filter configured for this tracker
+      </description>
+      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/>
     </property>
+
     <method name="Matches">
-      <description>
-	Return the list of entities that match the filter
+      <description language="en">
+        Return the list of entities that match the filter entity selection criteria
       </description>
       <arg name="entities" type="a[GeofenceEntity]" direction="out"/>
     </method>
+
     <signal name="EntityChanged" sessioncast="true">
       <description language="en">
-	The entity has has moved or entered or left the geofence
+        The entity has crossed the geofence boarder for the reference entity
       </description>
+      <arg name="tracker" type="o" direction="out"/>
       <arg name="entity" type="[GeofenceEntity]" direction="out"/>
     </signal>
+
     <signal name="EndOfLifeThresholdReached" sessioncast="true">
       <description language="en">
-	The threshold for reclaiming the filter has been crossed
+        The threshold for reclaiming the filter has been crossed
       </description>
+      <arg name="tracker" type="o" direction="out"/>
       <arg name="secondsRemaining" type="u" direction="out"/>
     </signal>
+
     <method name="KeepAlive">
       <description language="en">
-	Reset the keep alive timer on the filter
+        Reset the keep alive timer on the filter
       </description>
       <annotation name="org.freedesktop.DBus.Method.NoReply" value="true"/>
     </method>"

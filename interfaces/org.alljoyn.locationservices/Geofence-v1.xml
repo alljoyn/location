@@ -1,63 +1,61 @@
 <?xml version="1.0"?>
 <node xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://www.alljoyn.org/schemas/introspect.xsd">
-  <interface name="org.alljoyn.locationservices.Distance.Geofence">
+  <interface name="org.alljoyn.locationservices.Geofence.Geofence">
     <description language="en" >
-      This interface contains methods for applications to access the data of the geofence service
+      This interface contains methods for applications to access geofence services data
     </description>		
     <property name="Version" type="q" access="read">
       <description language="en">Interface Version</description>
-      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
+      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/>
     </property>
     <annotation name="org.alljoyn.Bus.Secure" value="true" />
+
     <struct name="Entity">
-     <description language="en" >
-       The representation of a device
-     </description>
-      <field name="entityId" type="s"/>
+      <description language="en">
+        Generic representation of a device
+      </description>
+      <field name="entityDescriptor" type="s"/>
+      <field name="entityUuid" type="s"/>
       <field name="entityMac" type="s"/>
     </struct>
-    <struct name="GeofenceEntity" >
-      <description language="en" >
-	The representation of a device in the geofence service
+
+    <struct name="GeofenceEntity">
+      <description language="en">
+        Geofence services representation of device information
       </description>
       <field name="entity" type="[Entity]"/>
-      <field name="geofence" type="i" />
+      <field name="withinFenceline" type="b"/>
     </struct>
+
     <struct name="GeofenceFilter">
-     <description language="en" >
-       A filter to match entities the application is interested in
-     </description>
-      <field name="entity" type="[Entity]" />
-      <!-- the filter is an entity with regular expressions in the field to match with entities in the location services -->
-      <field name="filter" type="[Entity]" />
-      <field name="entities" type="a[Entity]" />
-    </struct>
-    <method name="GeofenceGeofenceSubscribe">
-      <description>
-        Subscribe for events that occur when firstEntity and secondEntity are in geofence.
-        Events are only sent again if the geofence change is  more than deltaGeofence (measured in cm)
+      <description language="en">
+        Service settings along with selection criteria for specifying entities of interest
       </description>
-      <arg name="filter" type="[GeofenceFilter]" direction="in"/>
-      <arg name="geofenceDelta" type="i" direction="in"/>
+      <!-- the reference fenceline is the distance around the reference entity that forms the geofence boundary -->
+      <field name="referenceFenceline" type="d"/>    
+      <!-- the reference entity is the entity from which distances to other entites are measured -->
+      <field name="referenceEntity" type="[Entity]"/>    
+      <!-- the entity parser is an entity filled with regular expressions for matching --> 
+      <field name="entityParser" type="[Entity]"/>
+      <!-- The entity list is a list of entities for matching -->
+      <field name="entityList" type="a[Entity]"/>
+    </struct>
+
+    <method name="GeofenceSubscribe">
+      <description language="en">
+        Request fenceline tracking based on the supplied filter
+      </description>
+      <arg name="geofenceFilter" type="[GeofenceFilter]" direction="in"/>
       <arg name="geofenceTracker" type="o" direction="out"/>
     </method>
 
     <method name="QueryGeofence">
       <description language="en">
-	query the service for all entities that match the filter
+        Query for fenceline crossing information based on the supplied filter
       </description>
-      <arg name="filter" type="GeofenceFilter" direction="in"/>
+      <arg name="geofenceFilter" type="[GeofenceFilter]" direction="in"/>
       <arg name="geofenceEntities" type="a[GeofenceEntity]" direction="out"/>
     </method>
 
-    <method name="QueryAllGeofenceGeofence">
-    <description>
-      Gets all the entities that are within a specified geofence
-    </description>
-      <arg name="entity" type="[Entity]" direction="in"/>
-      <arg name="geofence" type="i" direction="in"/>
-      <arg name="geofenceMultiplier" type="i" direction="in"/>
-      <arg name="nearbyEntities" type="a[GeofenceEntity]" direction="out"/>
-    </method>
   </interface>
 </node>
