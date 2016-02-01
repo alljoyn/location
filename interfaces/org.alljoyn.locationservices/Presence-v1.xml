@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+2<?xml version="1.0"?>
 <node xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://www.alljoyn.org/schemas/introspect.xsd">
   <interface name="org.alljoyn.locationservices.Presence.Presence">
     <annotation name="org.alljoyn.Bus.DocString.en"
@@ -27,7 +27,6 @@
         Generic representation of a device
       </description>
       <field name="entityDescriptor" type="s"/>
-      <field name="entityUuid" type="s"/>
       <field name="entityMac" type="s"/>
     </struct>
 

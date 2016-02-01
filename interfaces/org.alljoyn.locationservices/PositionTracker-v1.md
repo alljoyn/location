@@ -1,11 +1,12 @@
-# org.alljoyn.locationservices.Presence.Tracker version 1
+# org.alljoyn.locationservices.Position.PositionTracker version 1
 ## Specification
 
-PresenceTrackers have a lifetime threshold and a lifetime. 
-When an instance of a PresenceTracker lifetime crosses the lifetime threshold, the service signals
-the application via the PresenceTracker using the EndofLifeThreasholdReached. 
+This interface tracks the position of entities that match the supplied filter
+PositionTracker have a lifetime threshold and a lifetime. 
+When an instance of a PositionTracker lifetime crosses the lifetime threshold, the service signals
+the application via the PositionTracker using the EndofLifeThreasholdReached. 
 If the application calls the KeepAlive method, the lifetime threshold and the lifetime is reset.
-If a KeepAlive is not recieved before the lifetime expires, the PreseneceTracker is reaped.
+If a KeepAlive is not recieved before the lifetime expires, the PositionTracker is reaped.
 
 |                       |                                                                       |
 |-----------------------|-----------------------------------------------------------------------|
@@ -18,29 +19,32 @@ If a KeepAlive is not recieved before the lifetime expires, the PreseneceTracker
 #### Filter
 |                       |                                                                       |
 |-----------------------|-----------------------------------------------------------------------|
-| Type                  | PresenceFilter                                                        |
+| Type                  | PositionFilter                                                        |
 | Access                | read-only                                                             |
 | Annotation            | org.freedesktop.DBus.Property.EmitsChangedSignal = true               |
 
-This is the filter that created the PresenceTracker.
+The position filter configured for this tracker
 
 ### Methods
 
-#### Matches() -> presenceEntity[]
+#### Matches() -> positionEntity[]
 |                       |                                                                       |
 |-----------------------|-----------------------------------------------------------------------|
-This returns the list of entities that match the filter that created the PresenceTracker.
+This returns the list of entities that match the filter that created the DistanceTrackers.
 
 
 Output Arguments:
 
-* **presenceEntity** --- PresenceEntity[] --- An array of presence entities that match the presenceFilter
+* **entities** --- PositionEntity[] --- An array of position entities that match the positionFilter
 
 
 #### KeepAlive()
 |                       |                                             |
 |-----------------------|---------------------------------------------|
 | Annotation            | org.freedesktop.DBus.Method.NoReply = true  |
+
+Reset the keep alive timer on the filter
+ 
 
 ### Signals
 
@@ -50,11 +54,12 @@ Output Arguments:
 | Signal Type           | sessioncast                       |
 
 
-This signal is emmited when an entity that matches the filter presence changes
+This signal is emmited when the distance from the reference entity has changed its position
 
 Output arguments:
 
-  * **entity** --- PresenceEntity --- The entity whose state has changed
+  * **tracker** --- PositionTracker --- Position Tracker
+  * **entity** --- PositionEntity --- The entity whose state has changed
 
 #### EndOfLifeThresholdReached
 
@@ -64,6 +69,7 @@ Output arguments:
 
 Output arguments:
 
+  * **tracker** --- PositionTracker --- Position Tracker
   * **secondsRemaining** --- uint32 --- The number of seconds remaining before the tracker is destroyed
 
 This signal is emitted when the EndOfLife threshold is crossed.
@@ -88,24 +94,52 @@ and a media specific identifier.
 
   * **entityDescriptor** --- string --- A human readable description of the entity
   * **entityMac** --- array of bytes --- the device specific ID (usually a MAC address)
+
+
+#### struct PositionTime
+
+The representation of time for the Position Service
+
+  * **year** --- uint16 --- Representation for year
+  * **month** --- byte --- Representation for month
+  * **day** --- byte --- Representation for day
+  * **hour** --- byte --- Representation for hour
+  * **second** --- byte --- Representation for second
+  * **millisecond** --- uint16 --- Representation for millisecond
+
+ 
+#### struct PositionData
+
+The representation of position data. 
+The field origin defines the reference point (e.g. wgs84)
+
+  * **origin** -- string -- Text representation fo the origin reference point
+  * **x** --- uint32 --- Representation of position on x-axis
+  * **y** --- uint32 --- Representation of position on y-axis
+  * **z** --- uint32 --- Representation of position on z-axis
+  * **horizontalAccuracy** --- uint32 --- Representation of the horizontal accuracy
+  * **horizontalAccuracyMultiplier** --- uint32 --- Representation of horizontal accuracy units
+  * **verticalAccuracy** --- uint32 --- Representation of the vertical accuracy
+  * **verticalAccuracyMultiplier** --- uint32 --- Representation of vertical accuracy units
+  * **time** --- PositionTime --- Representation of the time the position was recorded
+
+#### struct PositionEntity
+
+Position services representation of device information
+
+  * **entity** -- Entity -- A representation of the device
+  * **positionData** --- PositionData --- The representation of position data.
+
+
+#### struct PositionFilter
+
+A filter to match entities the application is interested in
+
+  * **powerPreference** -- uint32 -- the power preference is an enum of HIGH, LOW or UNSPECIFIED
+  * **accuracyPreference** --- uint32 --- the accuracy preference is an enum of HIGH, LOW or UNPSECIFIED 
+  * **entityParser** -- Entity -- the entity parser is an entity filled with regular expressions for matching
+  * **entityList** --- a[Entity] --- The entity list is a list of entities for matching 
   
-#### struct PresenceEntity
-
-A PresenceEntity is a representation of a device in the presence service. 
-It contains an entity (a human readable description and a unique id of the device) and a boolean
-representing wether the device is present. 
-
-  * **entity** -- Entity -- The entity for the device
-  * **present** --- boolean --- Wether the device is present or not.
-
-#### struct PresenceFilter
-
-A PresenceFilter is used to query or subscribe to information held in the presence service.
-The filter contains Service settings along with selection criteria for specifying entities of interest.
-
-  * **entityParser** --- Entity --- The entity parser is an entity filed with regular expressions for matching
-  * **entityList** --- a[Entity] --- The entity list is a list of entities for matching
-
-
+  
 ## References
   * theroy-of-operations

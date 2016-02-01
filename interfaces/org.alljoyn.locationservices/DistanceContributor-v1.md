@@ -1,7 +1,7 @@
-# org.alljoyn.locationservices.Presence.Contributor version 1
+# org.alljoyn.locationservices.Distance.Contributor version 1
 ## Specification
-The Contributor interface allows external devices (called contributing devices) to inject presence
-information into the presence service.
+The Contributor interface allows external devices (called contributing devices) to inject distance
+information into the distance service.
 These devices can be sensors, cell phones or any AllJoyn device.
 
 |                       |                                                                       |
@@ -12,20 +12,24 @@ These devices can be sensors, cell phones or any AllJoyn device.
 
 ### Methods
 
-#### UpdatePresenceInfo(contributor, entity, isPresent)
+#### UpdateDistanceInfo(contributor, entity, distance, distanceMultiplier, accuracy, accuracyMultiplier)
 
-This method is called by the contributing device to add the entity to the presence service or
-update the state of the entity in the presence service.
+This method is called by the contributing device to add the entity to the distance service or
+update the state of the entity in the distance service.
 
 Input arguments:
 
  * **contributor** --- Entity --- The entity representing the contributing device
  * **entity** --- Entity --- The entity to update
- * **isPresent** -- boolean --- True if entity is detected, false if not detected
-
+ * **distance** --- double --- integer representing the distance of the device from a reference entity  
+ * **distanceMultiplier** --- uint32 --- distance multiplier  
+ * **accuracy** --- uint32 --- integer representing the accuracy of the measurment  
+ * **accuracyMultiplier** --- uint32 --- accuracy multiplier
+ 
+  
 ### Named Types
 
-#### struct PresenceEntity
+#### struct Entity
 
 Entities are objects that are tracked by the location services.
 An entity may or may not be a member of the AllJoyn bus. 

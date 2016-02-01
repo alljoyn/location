@@ -8,8 +8,7 @@ The Geofence interface is used by applications to retrieve geofence event data f
 An application can query the service using a GeofenceFilter and recieve zero or more entities that
 match the filter. Alternativly an application can subscribe to the geofence service using a filter. 
 The service will return a GeofenceTracker object.
-The service will signal the application using the GeofenceTracker object when the presence of an 
-entity that matches the filter changes.
+The service will signal the application using the GeofenceTracker object when the entity that matches the filter enters or leaves the geofence.
 
  
 
@@ -21,14 +20,14 @@ entity that matches the filter changes.
 
 ### Methods
 
-#### GeofenceGeofenceSubscribe(filter) -> (geofenceTracker)
+#### GeofenceSubscribe(filter) -> (geofenceTracker)
 
 |                       |                                             |
 |-----------------------|---------------------------------------------|
 
 
-Subscribe for events that occur when firstEntity and secondEntity are in geofence.
-Events are only sent again if the geofence change is more than deltaGeofence (measured in cm)
+Subscribe for events that occur when matching entities enter or leave the geofence.
+Events are sent only once if an entity enters or leaves the geofence.
 This method returns a tracker. 
 If a tracker exists that matches the filter it is returned,
 otherwise a new tracker object is created.
@@ -36,8 +35,7 @@ Trackers have a lifetime and will be reaped after the lifetime is exceeded.
 
 Input arguments:
 
-  * **filter** --- GeofenceFilter --- A filter to match entities
-  * **geofenceDelta** --- uint32 --- Geofence change distance threshold (measured in cm)
+  * **geofenceFilter** --- GeofenceFilter --- A filter to match entities
   
 
 Output arguments:
@@ -50,36 +48,18 @@ Errors raised by this method:
 |                       |                                             |
 |-----------------------|---------------------------------------------|
 
-Query the service for all entities that match the filter (Needs Updating)
-
+Query the service for all entities that match the filter. Entities both inside and outside the geofence are returned.
 Input Arguments:
 
-* **filter** --- GeofenceFilter --- The filter to be used to select the geofence entities to return 
+* **geofenceFilter** --- GeofenceFilter --- The filter to be used to select the geofence entities to return 
 
 Output Arguments:
 
 * **geofenceEntities** --- GeofenceEntity[] --- An array of geofence entities that match the geofenceFilter
 
-#### QueryAllGeofenceGeofence(entity) -> (GeofenceEntity)
-
-|                       |                                             |
-|-----------------------|---------------------------------------------|
-
-This method is a convenience method, it creates a filter for the passed entity and calls QueryGeofence
-
-Input Arguments
-
-* **entity** --- Entity --- An Entity
-* **geofence** --- uint32 --- (Needs Updating)
-* **geofenceMultiplier** --- uint32 --- (Needs Updating)
-
-
-Output Arguments:
-
-* **nearbyEntities** --- a[GeofenceEntity] --- Returns an array of Geofence Entity objects
-
 #### struct Entity
 
+Entity is a generic representation of a device
 Entities are objects that are tracked by the location services.
 An entity may or may not be a member of the AllJoyn bus. 
 An entity may be known or anonymous. 
@@ -87,32 +67,31 @@ A known entity is registered with the service by an application.
 Entities that are discovered, and not pre-registered are designated as unknown entities.
 An entity is comprised of two strings, a unique identifier and a media specific identifier. 
 The unique identifier is a human readable string.
-The media specific identifier will normally be the MAC address. 
+The media specific identifier is a unique descriptive string or it can be the MAC address if available. 
 Location Services uses both the unique identifier and the media specific identifier when matching 
 entities. Anonymous entities will have a unique identifier of 00000000-0000-0000-0000-000000000000
-and a media specific identifier of their MAC address.
+and a media specific identifier.
 
-  * **entityId** --- string --- A unique ID associated with an entity (usually a UUID)
+  * **entityDescriptor** --- string --- A human readable description of the entity
   * **entityMac** --- array of bytes --- the device specific ID (usually a MAC address)
  
 #### struct GeofenceEntity
 
-A GeofenceEntity is a representation of a device in the geofence service. 
+A GeofenceEntity is Geofence services representation of device information 
 It contains an entity (a human readable description and a unique id of the device) and an integer
 representing ... 
 
   * **entity** -- Entity -- The entity for the device
-  * **geofence** ---uint32--- (Needs Updating).
+  * **withinFenceline** --- boolean --- boolean to indicate if the device is within the fenceline
 
 #### struct GeofenceFilter
 
-A GeofenceFilter is used to match entities the application is interested in.
-The filter contains a regular expression to match ain the field to match with entities in the location services. (Needs Updating)
+A GeofenceFilter is used to match Service settings along with selection criteria for specifying entities of interest
 
-  * **entity** -- Entity -- The entity for the device
-  * **filter** --- Entity --- A filter is an entity with regular expressions in the field to match with entities in the location services
-  * **entities** --- Entity array --- An array of Entities that match the filter criteria
-
+  * **referenceFenceline** -- double -- The reference fenceline is the distance around the reference entity that forms the geofence boundary
+  * **referenceEntity** -- Entity -- The reference entity is the entity from which distances to other entites are measured
+  * **entityParser** --- Entity --- The entity parser is an entity filled with regular expressions for matching
+  * **entityList** --- a[Entity] --- The entity list is a list of entities for matching
 
 ## References
 

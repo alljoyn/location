@@ -1,11 +1,12 @@
-# org.alljoyn.locationservices.Presence.Tracker version 1
+# org.alljoyn.locationservices.Geofence.GeofenceTracker version 1
 ## Specification
 
-PresenceTrackers have a lifetime threshold and a lifetime. 
-When an instance of a PresenceTracker lifetime crosses the lifetime threshold, the service signals
-the application via the PresenceTracker using the EndofLifeThreasholdReached. 
+This interface tracks fenceline crossings around a reference entity by other entities that match the supplied filter
+GeofenceTracker have a lifetime threshold and a lifetime. 
+When an instance of a GeofenceTracker lifetime crosses the lifetime threshold, the service signals
+the application via the GeofenceTracker using the EndofLifeThreasholdReached. 
 If the application calls the KeepAlive method, the lifetime threshold and the lifetime is reset.
-If a KeepAlive is not recieved before the lifetime expires, the PreseneceTracker is reaped.
+If a KeepAlive is not recieved before the lifetime expires, the GeofenceTracker is reaped.
 
 |                       |                                                                       |
 |-----------------------|-----------------------------------------------------------------------|
@@ -18,29 +19,32 @@ If a KeepAlive is not recieved before the lifetime expires, the PreseneceTracker
 #### Filter
 |                       |                                                                       |
 |-----------------------|-----------------------------------------------------------------------|
-| Type                  | PresenceFilter                                                        |
+| Type                  | PositionFilter                                                        |
 | Access                | read-only                                                             |
 | Annotation            | org.freedesktop.DBus.Property.EmitsChangedSignal = true               |
 
-This is the filter that created the PresenceTracker.
+The position filter configured for this tracker
 
 ### Methods
 
-#### Matches() -> presenceEntity[]
+#### Matches() -> geofenceEntity[]
 |                       |                                                                       |
 |-----------------------|-----------------------------------------------------------------------|
-This returns the list of entities that match the filter that created the PresenceTracker.
+Return the list of entities that match the filter entity selection criteria.
 
 
 Output Arguments:
 
-* **presenceEntity** --- PresenceEntity[] --- An array of presence entities that match the presenceFilter
+* **entities** --- GeofenceEntity[] --- An array of geofence entities that match the geofenceFilter
 
 
 #### KeepAlive()
 |                       |                                             |
 |-----------------------|---------------------------------------------|
 | Annotation            | org.freedesktop.DBus.Method.NoReply = true  |
+
+Reset the keep alive timer on the filter
+ 
 
 ### Signals
 
@@ -50,11 +54,12 @@ Output Arguments:
 | Signal Type           | sessioncast                       |
 
 
-This signal is emmited when an entity that matches the filter presence changes
+This signal is emmited when the entity has crossed the geofence boarder for the reference entity
 
 Output arguments:
 
-  * **entity** --- PresenceEntity --- The entity whose state has changed
+  * **tracker** --- GeofenceTracker --- Geofence Tracker
+  * **entity** --- GeofenceEntity --- The entity whose state has changed
 
 #### EndOfLifeThresholdReached
 
@@ -64,6 +69,7 @@ Output arguments:
 
 Output arguments:
 
+  * **tracker** --- GeofenceTracker --- Geofence Tracker
   * **secondsRemaining** --- uint32 --- The number of seconds remaining before the tracker is destroyed
 
 This signal is emitted when the EndOfLife threshold is crossed.
@@ -88,24 +94,26 @@ and a media specific identifier.
 
   * **entityDescriptor** --- string --- A human readable description of the entity
   * **entityMac** --- array of bytes --- the device specific ID (usually a MAC address)
-  
-#### struct PresenceEntity
 
-A PresenceEntity is a representation of a device in the presence service. 
-It contains an entity (a human readable description and a unique id of the device) and a boolean
-representing wether the device is present. 
+
+#### struct GeofenceEntity
+
+A GeofenceEntity is Geofence services representation of device information 
+It contains an entity (a human readable description and a unique id of the device) and an integer
+representing ... 
 
   * **entity** -- Entity -- The entity for the device
-  * **present** --- boolean --- Wether the device is present or not.
+  * **withinFenceline** --- boolean --- boolean to indicate if the device is within the fenceline
 
-#### struct PresenceFilter
+#### struct GeofenceFilter
 
-A PresenceFilter is used to query or subscribe to information held in the presence service.
-The filter contains Service settings along with selection criteria for specifying entities of interest.
+A GeofenceFilter is used to match Service settings along with selection criteria for specifying entities of interest
 
-  * **entityParser** --- Entity --- The entity parser is an entity filed with regular expressions for matching
+  * **referenceFenceline** -- double -- The reference fenceline is the distance around the reference entity that forms the geofence boundary
+  * **referenceEntity** -- Entity -- The reference entity is the entity from which distances to other entites are measured
+  * **entityParser** --- Entity --- The entity parser is an entity filled with regular expressions for matching
   * **entityList** --- a[Entity] --- The entity list is a list of entities for matching
 
-
+  
 ## References
   * theroy-of-operations

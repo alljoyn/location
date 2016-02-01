@@ -22,7 +22,7 @@ entity that matches the filter changes.
 |                       |                                             |
 |-----------------------|---------------------------------------------|
 
-
+Request presence tracking based on the supplied filter
 This method returns a tracker. 
 If a tracker exists that matches the filter it is returned,
 otherwise a new tracker object is created.
@@ -30,7 +30,7 @@ Trackers have a lifetime and will be reaped after the lifetime is exceeded.
 
 Input arguments:
 
-  * **filter** --- PresenceFilter --- A filter to match entities
+  * **presenceFilter** --- PresenceFilter --- A filter to match entities
 
 Output arguments:
 
@@ -44,29 +44,16 @@ Errors raised by this method:
 
 Input Arguments:
 
-* **filter** --- PresenceFilter --- The filter to be used to select the presence entities to return 
+* **presenceFilter** --- PresenceFilter --- The filter to be used to select the presence entities to return 
 
 Output Arguments:
 
-* **presenceEntity** --- PresenceEntity[] --- An array of presence entities that match the presenceFilter
+* **presenceEntities** --- a[PresenceEntity] --- An array of presence entities that match the presenceFilter
 
-#### QueryPresenceEntity(entity) -> (isPresent)
-
-|                       |                                             |
-|-----------------------|---------------------------------------------|
-
-This method is a convienence method, it creates a filter for the passed entity and calls QueryPresence
-
-Input Arguments
-
-* **entity** --- Entity --- An Entity
-
-Output Arguments:
-
-* **isPresent** --- boolean --- true if the entity is present, false if it is not
 
 #### struct Entity
 
+Entity is a generic representation of a device
 Entities are objects that are tracked by the location services.
 An entity may or may not be a member of the AllJoyn bus. 
 An entity may be known or anonymous. 
@@ -74,14 +61,14 @@ A known entity is registered with the service by an application.
 Entities that are discovered, and not pre-registered are designated as unknown entities.
 An entity is comprised of two strings, a unique identifier and a media specific identifier. 
 The unique identifier is a human readable string.
-The media specific identifier will normally be the MAC address. 
+The media specific identifier is a unique descriptive string or it can be the MAC address if available. 
 Location Services uses both the unique identifier and the media specific identifier when matching 
 entities. Anonymous entities will have a unique identifier of 00000000-0000-0000-0000-000000000000
-and a media specific identifier of their MAC address.
+and a media specific identifier.
 
   * **entityDescriptor** --- string --- A human readable description of the entity
   * **entityMac** --- array of bytes --- the device specific ID (usually a MAC address)
- 
+  
 #### struct PresenceEntity
 
 A PresenceEntity is a representation of a device in the presence service. 
@@ -89,15 +76,15 @@ It contains an entity (a human readable description and a unique id of the devic
 representing wether the device is present. 
 
   * **entity** -- Entity -- The entity for the device
-  * **present** ---boolean--- Wether the device is present or not.
+  * **present** --- boolean --- Wether the device is present or not.
 
 #### struct PresenceFilter
 
 A PresenceFilter is used to query or subscribe to information held in the presence service.
-The filter contains a regular expression to match against the entityDescriptor and a regular expression to match against the entityMac of a PresenceEntity.
+The filter contains Service settings along with selection criteria for specifying entities of interest.
 
-  * **descriptorParser** --- string --- A regular expression used to match the entityDescriptor of entities
-  * **macParser** --- string --- A regular expression used to match the entityMac of entities
+  * **entityParser** --- Entity --- The entity parser is an entity filed with regular expressions for matching
+  * **entityList** --- a[Entity] --- The entity list is a list of entities for matching
 
 
 ## References
@@ -106,4 +93,3 @@ The filter contains a regular expression to match against the entityDescriptor a
   * The [Theory of Operations] (theory-of-operations)
   * The [PresenceTracker] (PresenceTracker-v1)
   * the [PresenceContributor] (PresenceContributor)
-
