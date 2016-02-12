@@ -22,7 +22,7 @@
       <description language="en">
         Presence services representation of device information
       </description>
-      <field name="entity" type=[Entity]"/>
+      <field name="entity" type="[Entity]"/>
       <field name="present" type="b"/>
     </struct>
 
