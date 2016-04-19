@@ -1,190 +1,119 @@
 import os
 import platform
-import re
-import urlparse
+import glob
 
-#######################################################
-# Custom Configure functions
-#######################################################
-def CheckCommand(context, cmd):
-    context.Message('Checking for %s command...' % cmd)
-    r = WhereIs(cmd)
-    context.Result(r is not None)
-    return r
+# Command arguments
+os_arg = ARGUMENTS.get('OS', os.environ.get('OS'))
+cpu_arg = ARGUMENTS.get('CPU', os.environ.get('CPU'))
+cross_compile_arg = ARGUMENTS.get('CROSS_COMPILE', '')
+variant_arg = ARGUMENTS.get('VARIANT', 'debug')
+verbosity_arg = ARGUMENTS.get('V', '0')
 
-def CheckAJLib(context, ajlib, ajheader, sconsvarname, ajdistpath, subdist, incpath, ext):
-    prog = "#include <%s>\nint main(void) { return 0; }" % ajheader
-    context.Message('Checking for AllJoyn library %s...' % ajlib)
-    distpath = os.path.join(ajdistpath, subdist)
-    prevLIBS = list(context.env.get('LIBS', []))
-    prevLIBPATH = list(context.env.get('LIBPATH', []))
-    prevCPPPATH = list(context.env.get('CPPPATH', []))
-
-    # Check if library is in standard system locations
-    context.env.Append(LIBS = [ajlib])
-    defpath = ''  # default path is a system directory
-    if not context.TryLink(prog, ext):
-        # Check if library is in project default location
-        context.env.Append(LIBPATH = os.path.join(distpath, 'lib'),
-                           CPPPATH = os.path.join(distpath, incpath))
-        if context.TryLink(prog, ext):
-            defpath = str(Dir(ajdistpath))  # default path is the dist directory
-        # Remove project default location from LIBPATH and CPPPATH
-        context.env.Replace(LIBPATH = prevLIBPATH, CPPPATH = prevCPPPATH)
-
-    vars = Variables()
-    vars.Add(PathVariable(sconsvarname,
-                          'Path to %s dist directory' % ajlib,
-                          os.environ.get('AJ_%s' % sconsvarname, defpath),
-                          lambda k, v, e : v == '' or PathVariable.PathIsDir(k, v, e)))
-    vars.Update(context.env)
-    Help(vars.GenerateHelpText(context.env))
-
-    # Get the actual library path to use ('' == system path, may be same as distpath)
-    libpath = context.env.get(sconsvarname, '')
-
-    if libpath is not '':
-        libpath = str(context.env.Dir(libpath))
-        # Add the user specified (or distpath) to LIBPATH and CPPPATH
-        context.env.Append(LIBPATH = os.path.join(libpath, subdist, 'lib'),
-                           CPPPATH = os.path.join(libpath, subdist, incpath))
-
-    # The real test for the library
-    r = context.TryLink(prog, ext)
-    if not r:
-        context.env.Replace(LIBS = prevLIBS, LIBPATH = prevLIBPATH, CPPPATH = prevCPPPATH)
-    context.Result(r)
-    return r
-
-def CheckAJCXXLib(context, ajlib, ajheader, sconsvarname, ajdistpath):
-    r = CheckAJLib(context, ajlib, ajheader, sconsvarname, ajdistpath, 'cpp', 'inc', '.cc')
-    return r
-
-#######################################################
-# Initialize our build environment
-#######################################################
-env = Environment(tools = ['default'])
-
-Export('env', 'CheckAJCXXLib')
-
-#######################################################
-# Default target platform
-#######################################################
-if platform.system() == 'Linux':
-    default_target = 'linux'
-elif platform.system() == 'Windows':
-    default_target = 'win32'
-elif platform.system() == 'Darwin':
-    default_target = 'darwin'
-
-#######################################################
-# Build variables
-#######################################################
-target_options = [ t.split('.')[-1] for t in os.listdir('.') if re.match('^SConscript\.target\.[-_0-9A-Za-z]+$', t) ]
-
+# Variables
 vars = Variables()
-vars.Add(BoolVariable('V',                  'Build verbosity',                     False))
-vars.Add(EnumVariable('TARG',               'Target platform variant',             os.environ.get('AJ_TARG',               default_target), allowed_values = target_options))
-vars.Add(EnumVariable('VARIANT',            'Build variant',                       os.environ.get('AJ_VARIANT',            'debug'),        allowed_values = ('debug', 'release')))
-vars.Add('CC',  'C Compiler override')
-vars.Add('CXX', 'C++ Compiler override')
-vars.Update(env)
-Help(vars.GenerateHelpText(env))
 
-#######################################################
-# Setup non-verbose output
-#######################################################
-if not env['V']:
-    env.Replace( CCCOMSTR =          '\t[CC]       $SOURCE',
-                 SHCCCOMSTR =        '\t[CC-SH]    $SOURCE',
-                 CXXCOMSTR =         '\t[CXX]      $SOURCE',
-                 SHCXXCOMSTR =       '\t[CXX-SH]   $SOURCE',
-                 LINKCOMSTR =        '\t[LINK]     $TARGET',
-                 SHLINKCOMSTR =      '\t[LINK-SH]  $TARGET',
-                 JAVACCOMSTR =       '\t[JAVAC]    $SOURCE',
-                 JARCOMSTR =         '\t[JAR]      $TARGET',
-                 ARCOMSTR =          '\t[AR]       $TARGET',
-                 ASCOMSTR =          '\t[AS]       $TARGET',
-                 RANLIBCOMSTR =      '\t[RANLIB]   $TARGET',
-                 INSTALLSTR =        '\t[INSTALL]  $TARGET',
-                 WSCOMSTR =          '\t[WS]       $WS' )
+# Common build variables
+vars.Add('OS', 'Target OS', os_arg)
+vars.Add('CPU', 'Target CPU', cpu_arg)
+vars.Add('CROSS_COMPILE', 'Toolchain Prefix', cross_compile_arg)
+vars.Add('VARIANT', 'Build Variant', variant_arg)
+vars.Add('V', 'Build Verbosity', verbosity_arg)
 
-#######################################################
-# Load target setup
-#######################################################
-env['build'] = True
-env['build_shared'] = False
-env['build_unit_tests'] = True
+# Base environment
+env = Environment(variables = vars, tools = ['gnulink', 'gcc', 'g++', 'ar', 'as', 'javac', 'javah', 'jar', 'pdf', 'pdflatex'])
 
-env.SConscript('SConscript.target.$TARG')
+# Specific build setup - update environment
+Export('env')
+SConscript('build_core/conf/' + env['OS'] + '/SConscript_' + env['CPU'])
 
-env['CPU'] = platform.machine()
-
-#######################################################
-# Check dependencies
-#######################################################
-config = Configure(env, custom_tests = { 'CheckCommand' : CheckCommand,
-                                           'CheckAJCXXLib' : CheckAJCXXLib })
-found_ws = config.CheckCommand('uncrustify')
-
-found_aj = config.CheckAJCXXLib('alljoyn',  'alljoyn/BusAttachment.h', 'ALLJOYN_DIST',
-                                os.path.join('#../core/alljoyn/build', env['TARG'], env['CPU'], env['VARIANT'], 'dist'))
-config.CheckCXXHeader('qcc/String.h')
-
-env = config.Finish()
-
-#######################################################
-# Compilation defines
-#######################################################
-if env['VARIANT'] == 'release':
-    env.Append(CPPDEFINES = [ 'NDEBUG' ])
-
-if env['CPU'] == 'x86_64':
-    env.Append(CPPDEFINES=['QCC_CPU_X86_64'])
+# Variants - debug or release
+if env['VARIANT'] == 'debug':
+   env.Append(CFLAGS = '-g')
+   env.Append(CXXFLAGS = '-g')
+   env.Append(JAVACFLAGS = '-g')
 else:
-    env.Append(CPPDEFINES=['QCC_CPU_X86'])
+   env.Append(CFLAGS = '-Os')
+   env.Append(CXXFLAGS = '-Os')
+   env.Append(LINKFLAGS = ['-s', '-Wl,--gc-sections'])
+   env.Append(CPPDEFINES = 'NDEBUG')
 
-#######################################################
-# Include path
-#######################################################
-env.Append(CPPPATH = '#inc')
 
-#######################################################
-# Process commandline defines
-#######################################################
-env.Append(CPPDEFINES = [ v for k, v in ARGLIST if k.lower() == 'define' ])
 
-#######################################################
-# Install header files
-#######################################################
-env.Install('#dist/include/alljoyn/location', env.Glob('inc/alljoyn/location/*.h'))
-# Need to force a dpendency here because SCons can't follow nested
-# #include dependencies otherwise
-env.Depends('#build/$VARIANT', '#dist/include')
+# Verbosity changes
+if env['V'] == '0':
+    env.Replace(CCCOMSTR =     '\t[CC]      $SOURCE',
+                SHCCCOMSTR =   '\t[CC-SH]   $SOURCE',
+                CXXCOMSTR =    '\t[CXX]     $SOURCE',
+                SHCXXCOMSTR =  '\t[CXX-SH]  $SOURCE',
+                LINKCOMSTR =   '\t[LINK]    $TARGET',
+                SHLINKCOMSTR = '\t[LINK-SH] $TARGET',
+                JAVACCOMSTR =  '\t[JAVAC]   $SOURCE',
+                JARCOMSTR =    '\t[JAR]     $TARGET',
+                ARCOMSTR =     '\t[AR]      $TARGET',
+                RANLIBCOMSTR = '\t[RANLIB]  $TARGET'
+                )
 
-#######################################################
-# Build the various parts
-#######################################################
-env.SConscript('src/SConscript', variant_dir='#build/$VARIANT/src', duplicate = 0)
-env.SConscript('samples/SConscript', variant_dir='#build/$VARIANT/samples', duplicate = 0)
+# Directory locations
+dist_dir='dist/' + env['OS'] + '/' + env['CPU'] + '/' + env['VARIANT']
+env.Replace(LIBPREFIX=[dist_dir + '/lib/lib'])
 
-#######################################################
-# Run the whitespace checker
-#######################################################
-# Set the location of the uncrustify config file
-if found_ws:
-    import sys
-    sys.path.append(os.getcwd() + '/tools')
-    import whitespace
+# Parse the argument list looking for additions
+cpp_path_args = ['./']
+lib_path_args = [dist_dir]
+libs_args   = []
+for key, value in ARGLIST:
+    if key == 'CPPPATH':
+        cpp_path_args.append(value)
+    elif key == 'LIBPATH':
+        lib_path_args.append(value)
+    elif key == 'LIBS':
+        libs_args.append(value)
+env.Append(CPPPATH=cpp_path_args)
+env.Append(LIBPATH=lib_path_args)
+env.Append(LIBS=libs_args)
 
-    def wsbuild(target, source, env):
-        return whitespace.main([ env['WS'], os.getcwd() + '/tools/ajuncrustify.cfg' ])
+### BEGIN - THIS IS COMMENTED OUT BECAUSE WE ARE NOT CURRENTLY USING THE CODE GENERATOR
+# Generated sources
+#def gen_files(env, gen_type, src_file, dst_dir ) :
+#    if not os.path.isdir(dst_dir):
+#        os.mkdir(dst_dir)
+#        os.system('ajcodegen.py -w org.alljoyn.locationservices' + \
+#                  ' -p ' + dst_dir + \
+#                  ' -t ' + gen_type + \
+#                  '    ' + src_file)
+#    return glob.glob(dst_dir + "/*")
+#env.AddMethod(gen_files, 'GenFiles')
+#generated_cpp=env.GenFiles("ddcpp",   "locationservices.xml", "locationservices_cpp")
+#generated_c=env.GenFiles("tl",      "locationservices.xml", "locationservices_c")
+#generated_android=env.GenFiles("android", "locationservices.xml", "locationservices_android")
+#
+## CPP provider/consumer library builds
+#generated_cpp_src = filter(lambda f: not '.h' in f, generated_cpp)
+#generated_cpp_cons = filter(lambda f: not 'Interface' in f, generated_cpp_src)
+#generated_cpp_prov = filter(lambda f: not 'Proxy' in f, generated_cpp_src)
+#
+#cons_static=env.StaticLibrary("consumer", generated_cpp_cons)
+#prov_static=env.StaticLibrary("provider", generated_cpp_prov)
+### END - THIS IS COMMENTED OUT BECAUSE WE ARE NOT CURRENTLY USING THE CODE GENERATOR
 
-    vars = Variables()
-    vars.Add(EnumVariable('WS', 'Whitespace Policy Checker', os.environ.get('AJ_WS', 'check'), allowed_values = ('check', 'detail', 'fix', 'off')))
 
-    vars.Update(env)
-    Help(vars.GenerateHelpText(env))
+# Install location services include files.
+env.Install([dist_dir + '/inc/ls/'], ['./LsStd.h','./LocationServices.h',
+                                      './includes/PresenceManagerInterface.h',
+                                      './includes/PresenceTrackerInterface.h',
+                                      './includes/PresenceContributorInterface.h',
+                                      './includes/DistanceManagerInterface.h',
+                                      './includes/DistanceTrackerInterface.h',
+                                      './includes/DistanceContributorInterface.h',
+                                      './includes/GeofenceManagerInterface.h',
+                                      './includes/GeofenceTrackerInterface.h',
+                                      './includes/PositionManagerInterface.h',
+                                      './includes/PositionTrackerInterface.h',
+                                      './includes/PositionContributorInterface.h'])
 
-    if env.get('WS', 'off') != 'off':
-        env.Command('#ws', '#dist', Action(wsbuild, '$WSCOMSTR'))
+
+# Provider Application (original interfaces)
+provider_list=env.Glob('provider/*.cc') 
+provider_app=env.Program(target='provider/ls-provider', source=provider_list, CXXFLAGS=['$CXXFLAGS', '-fexceptions'])
+env.Install([dist_dir + '/'], provider_app)
+

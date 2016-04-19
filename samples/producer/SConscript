@@ -1,3 +1,0 @@
-Import('sample_env')
-
-sample_env.Program('#dist/bin/producer', Glob('*.cc'))

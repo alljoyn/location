@@ -1,0 +1,54 @@
+import os
+import platform
+Import('env')
+
+
+# "Standard" C/C++ header file include paths for all projects.
+#env.Append(CPPPATH = ["$DISTDIR/cpp/inc",
+#                      "$DISTDIR/c/inc"])
+
+# "Standard" C/C++ library paths for all projects.
+#env.Append(LIBPATH = ["$DISTDIR/cpp/lib",
+#                      "$DISTDIR/c/lib"])
+
+# Special flags
+env.Append(CPPDEFINES=['QCC_CPU_X86_64',
+                       'QCC_OS_LINUX',
+                       'QCC_OS_GROUP_POSIX',
+                       '_GLIBCXX_USE_C99_FP_MACROS_DYNAMIC'])
+env.Append(CFLAGS = ['-Wall',
+                     '-Werror',
+                     '-pipe',
+                     '-std=c99',
+                     '-fno-strict-aliasing',
+                     '-fno-asynchronous-unwind-tables',
+                     '-fno-unwind-tables',
+                     '-ffunction-sections',
+                     '-fdata-sections',
+                     '-Wno-long-long'])
+env.Append(CXXFLAGS = ['-Wall',
+                       '-pipe',
+                       '-std=gnu++0x',
+                       '-fpermissive',
+                       '-fno-strict-aliasing',
+                       '-fno-asynchronous-unwind-tables',
+                       '-fno-unwind-tables',
+                       '-ffunction-sections',
+                       '-fdata-sections',
+                       '-Wno-long-long',
+                       '-Wno-deprecated',
+                       '-Wno-unknown-pragmas'])
+env.Append(JAVACFLAGS = ['-Xlint', '-Xlint:-serial'])
+
+
+
+
+# Raspberry PI updates
+env['CC']     = env['CROSS_COMPILE'] + 'gcc'
+env['CXX']    = env['CROSS_COMPILE'] + 'g++'
+env['LINK']   = env['CROSS_COMPILE'] + 'g++'
+env['AR']     = env['CROSS_COMPILE'] + 'ar'
+env['RANLIB'] = env['CROSS_COMPILE'] + 'ranlib'
+
+Export('env')
+Return('env')
