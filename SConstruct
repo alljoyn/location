@@ -117,4 +117,9 @@ lservices_list=env.Glob('lservices/*.cc')
 lservices_app=env.Program(target='lservices/lservices', source=lservices_list, CXXFLAGS=['$CXXFLAGS', '-fexceptions'], LINKFLAGS=['$LINKFLAGS', '-Wl,-Map=./lservices/lservices.map'])
 env.Install([dist_dir + '/'], lservices_app)
 
+# Fake Contributing Device
+fcd_list=env.Glob('fcd/*.cc')
+fcd_app=env.Program(target='fcd/fcd',source=fcd_list,CXXFLAGS=['$CXXFLAGS', '-fno-exceptions'])  
+env.Install([dist_dir + '/'],fcd_app)
+
 
