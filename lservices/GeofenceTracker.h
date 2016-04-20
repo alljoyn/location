@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2015, AllSeen Alliance. All rights reserved.
+ * Copyright (c) 2016, AllSeen Alliance. All rights reserved.
  *
  *    Permission to use, copy, modify, and/or distribute this software for any
  *    purpose with or without fee is hereby granted, provided that the above
@@ -13,38 +13,37 @@
  *    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
-#ifndef DISTANCE_TRACKER_H_
-#define DISTANCE_TRACKER_H_
+#ifndef GEOFENCE_TRACKER_H_
+#define GEOFENCE_TRACKER_H_
 
 
-class DistanceTracker : public LsTracker, public ajn::BusObject, public DbListener
+class GeofenceTracker : public TrackerObject 
 {
-private: 
-    qcc::Mutex cacheMutex;
-   
-    DbDevice* trackerDevice;
-    qcc::String trackerSignature;
-    double trackerDelta;
+private:
+    ajn::MsgArg* filterArg;
+    double fencelineArg;
+
+    qcc::Mutex attributeMutex;
+    std::unordered_map<DbCursor, bool> attributeMap;
 
     QStatus Get(const char* ifcName, const char* propName, ajn::MsgArg& val);
+    void Matches(const ajn::InterfaceDescription::Member* member, ajn::Message& msg);   
     void KeepAlive(const ajn::InterfaceDescription::Member* member, ajn::Message& msg);
-    void Query(const ajn::InterfaceDescription::Member* member, ajn::Message& msg);
-    bool CacheChanged(qcc::String signature, uint32_t timestamp, double range);
-    void TrackingSignal(qcc::String signature, double range);
-    
+    void SignalChanges(bool cacheFlush,
+                       DbCursor contributorCursor, 
+                       DbCursor discoveryCursor,
+                       double distance);
+    bool PostAttribute(DbCursor cursor, bool withinFenceline);
 public:
-    DistanceTracker(qcc::String path, ajn::BusAttachment* msgBus, LsDatabase* lsDb, LsManager* lsMan);
-    ~DistanceTracker();
+
+    GeofenceTracker(ajn::BusAttachment* msgBus, ServiceDatabase* svcDb);
+    ~GeofenceTracker();
     QStatus Start(ajn::Message& msg);
-    void DetectEvent(qcc::String sensorSignature, 
-                     qcc::String entitySignature,
-                     uint32_t timestamp, 
-                     bool detect);
-    void RangeEvent(qcc::String sensorSignature, 
-                    qcc::String entitySignature,
-                    uint32_t timestamp, 
-                    double range);
+    void DistanceEvent(bool cacheFlush,
+                       DbCursor contributorCursor, 
+                       DbCursor discoveryCursor,
+                       double distance);
 };             
 
 
-#endif /* DISTANCE_TRACKER_H_ */
+#endif /* GEOFENCE_TRACKER_H_ */

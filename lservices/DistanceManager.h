@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2015, AllSeen Alliance. All rights reserved.
+ * Copyright (c) 2016, AllSeen Alliance. All rights reserved.
  *
  *    Permission to use, copy, modify, and/or distribute this software for any
  *    purpose with or without fee is hereby granted, provided that the above
@@ -13,39 +13,26 @@
  *    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
-#ifndef LS_TRACKER_H_
-#define LS_TRACKER_H_
+#ifndef DISTANCE_MANAGER_H_
+#define DISTANCE_MANAGER_H_
 
 
-class LsTracker
+class DistanceManager : public ServiceObject
 {
 private:
-    qcc::Mutex trackerMutex;
+    qcc::Mutex trackersMutex;
+    std::vector<TrackerObject*> trackers;
 
-    uint32_t ttlPeriodMs;
-    uint32_t ttlSignalMs;
-    uint32_t ttlTimestamp;
-
-protected:
-    uint16_t trackerVersion;
-    qcc::String trackerPath;
-
-    const ajn::InterfaceDescription* intf;
-    ajn::BusAttachment* msgBus;
-    ajn::BusObject* busObject;
-    LsDatabase* lsDb;
-    LsManager* lsMan;
-
-    DbFilter* dbFilter;
-    DbResult* dbCache;
-    
+    QStatus Get(const char* ifcName, const char* propName, ajn::MsgArg& val);
+    void DistanceSubscribe(const ajn::InterfaceDescription::Member* member, ajn::Message& msg);   
+    void QueryDistance(const ajn::InterfaceDescription::Member* member, ajn::Message& msg);     
 public:
 
-    LsTracker(uint16_t trackerVersion, qcc::String trackerPath);
-    ~LsTracker();
-    bool LifetimeRemaining();
-    void LifetimeExtension();
+    DistanceManager(ajn::BusAttachment* msgBus, ServiceDatabase* svcDb);
+    ~DistanceManager();
+    QStatus Start();
+    void Check();
 };             
 
 
-#endif /* LS_TRACKER_H_ */
+#endif /* DISTANCE_MANAGER_H_ */

@@ -13,33 +13,38 @@
  *    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
-#ifndef LS_MANAGER_H_
-#define LS_MANGER_H_
+#ifndef SERVICE_MANAGER_H_
+#define SERVICE_MANGER_H_
 
-class Locationservices;
 
-class LsManager : public ajn::SessionPortListener 
+class ServiceManager : public ajn::SessionPortListener 
 {
 private:
-    const char* GUID = "353e370d-e654-4908-8a45-37d3e8d74a5c";
+    const char* APP_GUID = "7f0abc4e-932a-4d94-bcba-986bdf24b2aa";
+    const char* DEVICE_GUID = "9ad62045-611d-485d-ab53-0017c28a02bb";
+    const char* SERVICE_NAME = "org.alljoyn.locationservices";
 
     ajn::BusAttachment* msgBus;
 
     ajn::AboutData aboutData;
     ajn::AboutObj* aboutObj;
-    LsDatabase* lsDb;
-    Locationservices* lsObject;
+
+    ServiceDatabase* svcDb;
+    
+    qcc::Mutex svcObjectsMutex;
+    std::vector<ServiceObject*> svcObjects;
+
     uint32_t apiTimestamp;
     
+    QStatus ApiInclude(ServiceObject* svcObject);
     bool AcceptSessionJoiner(ajn::SessionPort sessionPort, const char* joiner, const ajn::SessionOpts& opts);
-    void SessionJoined(ajn::SessionPort sessionPort, ajn::SessionId id, const char* joiner);
-    
+    void SessionJoined(ajn::SessionPort sessionPort, ajn::SessionId id, const char* joiner);    
 public:
-    LsManager(ajn::BusAttachment* msgBus);
-    ~LsManager();
+    ServiceManager(ajn::BusAttachment* msgBus);
+    virtual ~ServiceManager();
     QStatus StartApi();
     void CheckApi();
 };             
 
 
-#endif /* LS_MANAGER_H_ */
+#endif /* SERVICE_MANAGER_H_ */

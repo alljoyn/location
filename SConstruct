@@ -112,8 +112,9 @@ env.Install([dist_dir + '/inc/ls/'], ['./LsStd.h','./LocationServices.h',
                                       './includes/PositionContributorInterface.h'])
 
 
-# Provider Application (original interfaces)
-provider_list=env.Glob('provider/*.cc') 
-provider_app=env.Program(target='provider/ls-provider', source=provider_list, CXXFLAGS=['$CXXFLAGS', '-fexceptions'])
-env.Install([dist_dir + '/'], provider_app)
+# lservices Application (updated interfaces)
+lservices_list=env.Glob('lservices/*.cc') 
+lservices_app=env.Program(target='lservices/lservices', source=lservices_list, CXXFLAGS=['$CXXFLAGS', '-fexceptions'], LINKFLAGS=['$LINKFLAGS', '-Wl,-Map=./lservices/lservices.map'])
+env.Install([dist_dir + '/'], lservices_app)
+
 

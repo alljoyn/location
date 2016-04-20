@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2015, AllSeen Alliance. All rights reserved.
+ * Copyright (c) 2016, AllSeen Alliance. All rights reserved.
  *
  *    Permission to use, copy, modify, and/or distribute this software for any
  *    purpose with or without fee is hereby granted, provided that the above
@@ -13,14 +13,14 @@
  *    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
-#ifndef LS_INCLUDE_H_
-#define LS_INCLUDE_H_
-
-#define NEW_VERSION 15.09
+#ifndef CONSTANTS_H_
+#define CONSTANTS_H_
 
 #include <algorithm>
 #include <cstdio>
 #include <ctype.h>
+#include <pthread.h>
+#include <regex>
 #include <signal.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -29,31 +29,30 @@
 #include <alljoyn/AboutObj.h>
 #include <alljoyn/BusAttachment.h>
 #include <alljoyn/BusObject.h>
-
-#ifdef NEW_VERSION
 #include <alljoyn/Init.h>
-#endif
-
 #include <alljoyn/MsgArg.h>
 #include <alljoyn/Status.h>
 #include <alljoyn/version.h>
-#include <ls/LsStd.h>
 #include <qcc/Debug.h>
 #include <qcc/Log.h>
 #include <qcc/Mutex.h>
 #include <qcc/String.h>
 #include <qcc/StringUtil.h>
-#include "LsDatabase.h"
-#include "LsManager.h"
-#include "LsTracker.h"
-#include "PresenceTracker.h"
-#include "DistanceTracker.h"
-#include "Locationservices.h"
 
 
-
-#define QCC_MODULE "lsProvider"
+#define QCC_MODULE "lservices"
 #define ArraySize(a)  (sizeof(a) / sizeof(a[0]))
+#define ER_LS_NO_MATCHES (QStatus)0x3030
+#define MAX_DISTANCE std::numeric_limits<double>::max()
 
+//extern qcc::String foo;
 
-#endif /* LS_INCLUDE_H_ */
+typedef struct
+{
+    qcc::String origin;
+    double xCoordinate;
+    double yCoordinate;
+    double zCoordinate;
+} Position;
+
+#endif /* CONSTANTS_H_ */

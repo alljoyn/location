@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2015, AllSeen Alliance. All rights reserved.
+ * Copyright (c) 2016, AllSeen Alliance. All rights reserved.
  *
  *    Permission to use, copy, modify, and/or distribute this software for any
  *    purpose with or without fee is hereby granted, provided that the above
@@ -17,29 +17,27 @@
 #define PRESENCE_TRACKER_H_
 
 
-class PresenceTracker : public LsTracker, public ajn::BusObject, public DbListener
+class PresenceTracker : public TrackerObject 
 {
 private:
-    qcc::Mutex cacheMutex;
+    ajn::MsgArg* filterArg;
 
     QStatus Get(const char* ifcName, const char* propName, ajn::MsgArg& val);
+    void Matches(const ajn::InterfaceDescription::Member* member, ajn::Message& msg);   
     void KeepAlive(const ajn::InterfaceDescription::Member* member, ajn::Message& msg);
-    void Query(const ajn::InterfaceDescription::Member* member, ajn::Message& msg);
-    bool CacheChanged(qcc::String signature, uint32_t timestamp, bool detect);
-    void TrackingSignal(qcc::String signature, bool detect);
-    
+    void SignalChanges(bool cacheFlush,
+                       DbCursor contributorCursor, 
+                       DbCursor discoveryCursor,
+                       bool presence);
 public:
-    PresenceTracker(qcc::String path, ajn::BusAttachment* msgBus, LsDatabase* lsDb, LsManager* lsMan);
+
+    PresenceTracker(ajn::BusAttachment* msgBus, ServiceDatabase* svcDb);
     ~PresenceTracker();
     QStatus Start(ajn::Message& msg);
-    void DetectEvent(qcc::String sensorSignature, 
-                     qcc::String entitySignature,
-                     uint32_t timestamp, 
-                     bool detect);
-    void RangeEvent(qcc::String sensorSignature, 
-                    qcc::String entitySignature,
-                    uint32_t timestamp, 
-                    int64_t range);
+    void PresenceEvent(bool cacheFlush,
+                       DbCursor contributorCursor, 
+                       DbCursor discoveryCursor,
+                       bool presence);
 };             
 
 

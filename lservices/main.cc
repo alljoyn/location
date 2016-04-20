@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2015, AllSeen Alliance. All rights reserved.
+ * Copyright (c) 2016, AllSeen Alliance. All rights reserved.
  *
  *    Permission to use, copy, modify, and/or distribute this software for any
  *    purpose with or without fee is hereby granted, provided that the above
@@ -13,12 +13,17 @@
  *    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
-#include "LsInclude.h"
+#include "Constants.h"
+#include "ServiceDatabase.h"
+#include "ServiceObject.h"
+#include "ServiceManager.h"
 
 
 using namespace std;
 using namespace qcc;
 using namespace ajn;
+
+//qcc::String foo = "*";
 
 static bool useBundledRouter = false;
 static volatile sig_atomic_t appQuit = false;
@@ -33,11 +38,15 @@ int main(int argc, char** argv)
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "-r") == 0) {
             useBundledRouter = true;
+
+        } else if (strcmp(argv[i], "-h") == 0) {
+            printf("lservices\n\n");
+            printf("-r  use embedded router\n");
+            exit(0);
         }
     }
 
     /* Handle required initialization. */
-#ifdef NEW_VERSION
     // Initialize alljoyn - this is only for versions newer than 14.12.
     if (AllJoynInit() != ER_OK) {
         return 1;
@@ -48,40 +57,37 @@ int main(int argc, char** argv)
             return 1;
         }
     }
-#endif
 
     /* Setup debug log information. */
     QCC_SetDebugLevel(QCC_MODULE, 7);
-    QCC_DbgPrintf(("AllJoyn Library Version: %s\n", ajn::GetVersion()));
-    QCC_DbgPrintf(("AllJoyn Library Build Info: %s\n", ajn::GetBuildInfo()));
+    QCC_DbgPrintf(("%s\n", ajn::GetBuildInfo()));
 
     /* Install SIGINT handler */
     signal(SIGINT, SigIntHandler);
 
     /* Create the message bus. */
-    ajn::BusAttachment* msgBus = new BusAttachment(argv[0], true, 8);
+    ajn::BusAttachment* msgBus = new BusAttachment(argv[0], true, 16);
 
     /* Start the API. */
-    LsManager *lsManager = new LsManager(msgBus );
-    QStatus status = (lsManager != NULL) ? lsManager->StartApi() : ER_FAIL;
+    ServiceManager *svcManager = new ServiceManager(msgBus);
+    QStatus status = (svcManager != NULL) ? svcManager->StartApi() : ER_FAIL;
     
     /* Run until we get a SIGINT. */
     appQuit = (status != ER_OK);
     while (!appQuit) {
-        lsManager->CheckApi();
+        svcManager->CheckApi();
         usleep(500 * 1000);
     }
 
     /* Cleanup. */
-    delete lsManager;
+    delete svcManager;
     delete msgBus;
 
-#ifdef NEW_VERSION
+    /* Shutdown. */
     if (useBundledRouter) {
         AllJoynRouterShutdown();
     }
     AllJoynShutdown();
-#endif
 
     return(0);
 }

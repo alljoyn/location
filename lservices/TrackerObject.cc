@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2015, AllSeen Alliance. All rights reserved.
+ * Copyright (c) 2016, AllSeen Alliance. All rights reserved.
  *
  *    Permission to use, copy, modify, and/or distribute this software for any
  *    purpose with or without fee is hereby granted, provided that the above
@@ -13,7 +13,10 @@
  *    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
-#include "LsInclude.h"
+#include "Constants.h"
+#include "ServiceDatabase.h"
+#include "ServiceObject.h"
+#include "TrackerObject.h"
 
 
 using namespace ajn;
@@ -21,26 +24,33 @@ using namespace std;
 using namespace qcc;
 
 
-LsTracker::LsTracker(uint16_t trackerVersion, qcc::String trackerPath) 
-    : trackerMutex(), trackerVersion(trackerVersion), trackerPath(trackerPath)
+TrackerObject::TrackerObject(qcc::String trackerPath, ajn::BusAttachment* msgBus, ServiceDatabase* svcDb) 
+        : DbListener(), ServiceObject((trackerPath + "/" + U32ToString(GetCursor())).c_str(), msgBus, svcDb),
+          ttlMutex(), ttlPeriodMs(300000), ttlSignalMs(240000), ttlTimestamp(ajn::BusAttachment::GetTimestamp()),
+          matchesMutex(), matchesCache(NULL)
 {
-    ttlPeriodMs = 300000;
-    ttlSignalMs = 240000;
-    ttlTimestamp = ajn::BusAttachment::GetTimestamp();
-}
-
-LsTracker::~LsTracker()
-{
+    QCC_DbgPrintf(("TrackerObject"));
     return;
 }
 
+TrackerObject::~TrackerObject()
+{
+    QCC_DbgPrintf(("~TrackerObject"));
+    
+    /* Delete the matches cache. */
+    matchesMutex.Lock(MUTEX_CONTEXT);
+    delete matchesCache;
+    matchesMutex.Unlock();
+}
 
-bool LsTracker::LifetimeRemaining() {
+
+bool TrackerObject::LifetimeRemaining() 
+{
     //QCC_DbgPrintf(("LifetimeRemaining - %ld", ttlTimestamp));
 
     bool result;
 
-    trackerMutex.Lock(MUTEX_CONTEXT);
+    ttlMutex.Lock(MUTEX_CONTEXT);
     try {
         uint32_t lifetime = ajn::BusAttachment::GetTimestamp() - ttlTimestamp;
 
@@ -52,13 +62,15 @@ bool LsTracker::LifetimeRemaining() {
             ttlSignalMs = ttlPeriodMs;
 
             // This works for Android but not Higgns.
-            MsgArg arg("u", ((ttlPeriodMs - lifetime) / 1000));
-            busObject->Signal(NULL, 
-                              SESSION_ID_ALL_HOSTED, 
-                              *(intf->GetMember("EndOfLife")), 
-                              &arg, 
-                              1);
-            QCC_DbgPrintf(("EndOfLife Signal - %s", trackerPath.c_str()));
+            MsgArg msgArgs[] = { {MsgArg("o", ServiceObject::GetPath())},
+                                 {MsgArg("u", ((ttlPeriodMs - lifetime) / 1000))} };
+
+            ServiceObject::Signal(NULL, 
+                                  SESSION_ID_ALL_HOSTED, 
+                                  *(svcIntf->GetMember("EndOfLifeThresholdReached")), 
+                                  msgArgs, 
+                                  ArraySize(msgArgs));
+            QCC_DbgPrintf(("EndOfLifeThresholdReached Signal - %s", ServiceObject::GetPath()));
 
         } else {
             result = true;
@@ -68,20 +80,19 @@ bool LsTracker::LifetimeRemaining() {
         result = true;
         QCC_DbgPrintf(("LifetimeRemaining Exception: %s\n", e.what()));
     }
-    trackerMutex.Unlock();
+    ttlMutex.Unlock();
 
     return result;
 }
 
-void LsTracker::LifetimeExtension() {
-    QCC_DbgPrintf(("LifetimeExtension - %s", trackerPath.c_str()));
+void TrackerObject::LifetimeExtension() 
+{
+    QCC_DbgPrintf(("LifetimeExtension - %s", ServiceObject::GetPath()));
 
-    trackerMutex.Lock(MUTEX_CONTEXT);
+    ttlMutex.Lock(MUTEX_CONTEXT);
     ttlPeriodMs = 300000;
     ttlSignalMs = 240000;
     ttlTimestamp = ajn::BusAttachment::GetTimestamp();
-    trackerMutex.Unlock();
+    ttlMutex.Unlock();
 }
-
-
 

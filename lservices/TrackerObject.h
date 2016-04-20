@@ -13,36 +13,26 @@
  *    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
-#ifndef LOCATIONSERVICES_H_
-#define LOCATIONSERVICES_H_
+#ifndef TRACKER_OBJECT_H_
+#define TRACKER_OBJECT_H_
 
 
-class Locationservices : public ajn::BusObject
+class TrackerObject : public DbListener, public ServiceObject
 {
 private:
-    const ajn::InterfaceDescription* intf;
-    ajn::BusAttachment* msgBus;
-    LsDatabase* lsDb;
-    LsManager* lsMan;
-
-    qcc::Mutex injectMutex;
-    qcc::Mutex trackerMutex;
-
-    std::vector<PresenceTracker*> presenceTrackers;
-    std::vector<DistanceTracker*> distanceTrackers;
-
-    void EntityPresence(const ajn::InterfaceDescription::Member* member, ajn::Message& msg);
-    void EntityRange(const ajn::InterfaceDescription::Member* member, ajn::Message& msg);
-    void PresenceSubscribe(const ajn::InterfaceDescription::Member* member, ajn::Message& msg);
-    void DistanceSubscribe(const ajn::InterfaceDescription::Member* member, ajn::Message& msg);
-    
+    qcc::Mutex ttlMutex;
+    uint32_t ttlPeriodMs;
+    uint32_t ttlSignalMs;
+    uint32_t ttlTimestamp;
+protected:
+    qcc::Mutex matchesMutex;
+    DbCache* matchesCache;
 public:
-
-    Locationservices(ajn::BusAttachment* msgBus, LsDatabase* lsDb, LsManager* lsMan);
-    ~Locationservices();
-    QStatus Start();
-    void Check();
+    TrackerObject(qcc::String trackerPath, ajn::BusAttachment* msgBus, ServiceDatabase* svcDb);
+    virtual ~TrackerObject();
+    bool LifetimeRemaining();
+    void LifetimeExtension();
 };             
 
 
-#endif /* LOCATIONSERVICES_H_ */
+#endif /* TRACKER_OBJECT_H_ */
